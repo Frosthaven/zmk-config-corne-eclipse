@@ -2,35 +2,6 @@ name: Build ZMK firmware
 
 on:
   workflow_dispatch:
-    inputs:
-      build_colemak_dh:
-        description: "Include Colemak-DH"
-        type: boolean
-        default: true
-      build_qwerty:
-        description: "Include QWERTY"
-        type: boolean
-        default: true
-      build_dvorak:
-        description: "Include Dvorak"
-        type: boolean
-        default: true
-      build_workman:
-        description: "Include Workman"
-        type: boolean
-        default: true
-      build_colemak:
-        description: "Include Colemak"
-        type: boolean
-        default: true
-      include_reset:
-        description: "Include Reset Firmware"
-        type: boolean
-        default: true
-      create_release:
-        description: "Draft Release"
-        type: boolean
-        default: true
 
 jobs:
   build:
@@ -39,7 +10,6 @@ jobs:
 
   release:
     name: Draft Release
-    if: inputs.create_release
     needs: [build]
     runs-on: ubuntu-latest
     permissions:
@@ -54,36 +24,19 @@ jobs:
           path: artifacts
 
       - name: Create per-layout zips
-        env:
-          BUILD_COLEMAK_DH: ${{ inputs.build_colemak_dh }}
-          BUILD_QWERTY: ${{ inputs.build_qwerty }}
-          BUILD_DVORAK: ${{ inputs.build_dvorak }}
-          BUILD_WORKMAN: ${{ inputs.build_workman }}
-          BUILD_COLEMAK: ${{ inputs.build_colemak }}
-          INCLUDE_RESET: ${{ inputs.include_reset }}
         run: |
           mkdir -p release
-
-          declare -A layout_enabled
-          layout_enabled[colemak_dh]="$BUILD_COLEMAK_DH"
-          layout_enabled[qwerty]="$BUILD_QWERTY"
-          layout_enabled[dvorak]="$BUILD_DVORAK"
-          layout_enabled[workman]="$BUILD_WORKMAN"
-          layout_enabled[colemak]="$BUILD_COLEMAK"
 
           # Group .uf2 files by layout
           for file in artifacts/firmware/*.uf2; do
             [ -f "$file" ] || continue
             basename=$(basename "$file")
             layout=$(echo "$basename" | sed 's/^left_corne_eclipse_//;s/^right_corne_eclipse_//;s/\.zmk\.uf2$//')
-
-            if [ "${layout_enabled[$layout]}" = "true" ]; then
-              mkdir -p "staging/$layout"
-              cp "$file" "staging/$layout/"
-            fi
+            mkdir -p "staging/$layout"
+            cp "$file" "staging/$layout/"
           done
 
-          # Zip each enabled layout
+          # Zip each layout
           if [ -d staging ]; then
             for layout_dir in staging/*/; do
               layout=$(basename "$layout_dir")
@@ -91,10 +44,8 @@ jobs:
             done
           fi
 
-          # Include reset firmware if enabled
-          if [ "$INCLUDE_RESET" = "true" ]; then
-            cp firmware-reference/settings_reset-nice_nano_v2-zmk.uf2 release/
-          fi
+          # Include reset firmware
+          cp firmware-reference/settings_reset-nice_nano_v2-zmk.uf2 release/
 
           echo "Release contents:"
           ls -la release/
