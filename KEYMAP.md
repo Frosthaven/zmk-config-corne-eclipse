@@ -72,4 +72,4 @@ natural.
   - Set `Control key` to `Command`
   - Set `Command key` to `Control`
 
-![Mac Keyboard Modifiers Settings](/assets/images/mac-rebind-modifiers)
+![Mac Keyboard Modifiers Settings](/assets/images/mac-rebind-modifiers.png)
