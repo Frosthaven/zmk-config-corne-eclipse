@@ -32,7 +32,7 @@ extra charge for adding break-away points to the plate print.
 Provide these files to the fabricator:
 - [corne-eclipse-plates.zip](/fabrication/!for-fabricator-production/corne-eclipse-plates.zip)
 
-## Shield Fabrication
+## Shield Case Fabrication
 
 ![Shield](/assets/images/corne-eclipse-shield.png)
 

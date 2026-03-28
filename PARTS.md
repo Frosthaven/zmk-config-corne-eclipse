@@ -47,5 +47,5 @@
 You will also need the following parts from the [Fabrication](FABRICATION.md) page:
 - 1x Circuit board set (left and right)
 - 1x Plate set (left and right)
-- 1x Shield casing (left and right)
-
+- 1x Left Shield Case
+- 1x Right Shield Case
