@@ -68,6 +68,7 @@
             ;
     };
 
+    /*
     physical_layout1: physical_layout_1 {
         compatible = "zmk,physical-layout";
         display-name = "Five Column Layout";
@@ -115,6 +116,7 @@
             , <&key_physical_attrs 100 100 1050  312       0     0     0>
             ;
     };
+    */
 
     default_transform: keymap_transform_0 {
         compatible = "zmk,matrix-transform";
@@ -132,6 +134,7 @@ RC(2,0) RC(2,1) RC(2,2) RC(2,3) RC(2,4) RC(2,5)  RC(2,6) RC(2,7) RC(2,8) RC(2,9)
         >;
     };
 
+    /*
     five_column_transform: keymap_transform_1 {
         compatible = "zmk,matrix-transform";
         columns = <10>;
@@ -147,6 +150,7 @@ RC(2,1) RC(2,2) RC(2,3) RC(2,4) RC(2,5)  RC(2,6) RC(2,7) RC(2,8) RC(2,9) RC(2,10
         RC(3,2) RC(3,3) RC(3,4) RC(3,5)  RC(3,6) RC(3,7) RC(3,8) RC(3,9)
         >;
     };
+    */
 
     kscan0: kscan {
         compatible = "zmk,kscan-gpio-matrix";

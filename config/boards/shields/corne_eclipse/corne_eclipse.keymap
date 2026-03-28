@@ -27,6 +27,10 @@
 /* DEVICE MAP ******************************************************************
 *******************************************************************************/
 
+#ifndef DEFAULT_TYPING_LAYER
+#define DEFAULT_TYPING_LAYER 0
+#endif
+
 #define COLDH 0
 #define QWERTY 1
 #define DVORAK 2
@@ -107,7 +111,42 @@
   keymap {
       compatible = "zmk,keymap";
 
+/* LAYER 0 — DEFAULT TYPING LAYER (selected at compile time) *****************/
+
       layout_layer_0 {
+#if DEFAULT_TYPING_LAYER == 1
+        display-name ="QWERTY";
+        bindings = <
+          &kp TAB               &kp Q             &kp W             &kp E             &kp R             &kp T             &kp Y             &kp U             &kp I             &kp O             &kp P                 &kp BSPC
+          &kp LCTRL             &kp A             &kp S             &kp D             &kp F             &kp G             &kp H             &kp J             &kp K             &kp L             &kp SEMI              &kp SQT
+          &kp LSHFT             &kp Z             &kp X             &kp C             &kp V             &kp B             &kp N             &kp M             &kp COMMA         &kp DOT           &kp FSLH              &kp RSHFT
+                                                  &kp C_MUTE        &kp LALT          &mo 5             &kp SPACE         &kp RET           &mo 6             &kp LGUI          &kp C_PLAY_PAUSE
+        >;
+#elif DEFAULT_TYPING_LAYER == 2
+        display-name ="DVORAK";
+        bindings = <
+          &kp TAB               &kp SQT           &kp COMMA         &kp DOT           &kp P             &kp Y             &kp F             &kp G             &kp C             &kp R             &kp L                 &kp BSPC
+          &kp LCTRL             &kp A             &kp O             &kp E             &kp U             &kp I             &kp D             &kp H             &kp T             &kp N             &kp S                 &kp FSLH
+          &kp LSHFT             &kp SEMI          &kp Q             &kp J             &kp K             &kp X             &kp B             &kp M             &kp W             &kp V             &kp Z                 &kp RSHFT
+                                                  &kp C_MUTE        &kp LALT          &mo 5             &kp SPACE         &kp RET           &mo 6             &kp LGUI          &kp C_PLAY_PAUSE
+        >;
+#elif DEFAULT_TYPING_LAYER == 3
+        display-name ="WRKMN";
+        bindings = <
+          &kp TAB               &kp Q             &kp D             &kp R             &kp W             &kp B             &kp J             &kp F             &kp U             &kp P             &kp SEMI              &kp BSPC
+          &kp LCTRL             &kp A             &kp S             &kp H             &kp T             &kp G             &kp Y             &kp N             &kp E             &kp O             &kp I                 &kp SQT
+          &kp LSHFT             &kp Z             &kp X             &kp M             &kp C             &kp V             &kp K             &kp L             &kp COMMA         &kp DOT           &kp FSLH              &kp RSHFT
+                                                  &kp C_MUTE        &kp LALT          &mo 5             &kp SPACE         &kp RET           &mo 6             &kp LGUI          &kp C_PLAY_PAUSE
+        >;
+#elif DEFAULT_TYPING_LAYER == 4
+        display-name ="COLMAK";
+        bindings = <
+          &kp TAB               &kp Q             &kp W             &kp F             &kp P             &kp G             &kp J             &kp L             &kp U             &kp Y             &kp SEMI              &kp BSPC
+          &kp LCTRL             &kp A             &kp R             &kp S             &kp T             &kp D             &kp H             &kp N             &kp E             &kp I             &kp O                 &kp SQT
+          &kp LSHFT             &kp Z             &kp X             &kp C             &kp V             &kp B             &kp K             &kp M             &kp COMMA         &kp DOT           &kp FSLH              &kp RSHFT
+                                                  &kp C_MUTE        &kp LALT          &mo 5             &kp SPACE         &kp RET           &mo 6             &kp LGUI          &kp C_PLAY_PAUSE
+        >;
+#else
         display-name ="COL-DH";
         bindings = <
           &kp TAB               &kp Q             &kp W             &kp F             &kp P             &kp B             &kp J             &kp L             &kp U             &kp Y             &kp SEMI              &kp BSPC
@@ -115,10 +154,22 @@
           &kp LSHFT             &kp Z             &kp X             &kp C             &kp D             &kp V             &kp K             &kp H             &kp COMMA         &kp DOT           &kp FSLH              &kp RSHFT
                                                   &kp C_MUTE        &kp LALT          &mo 5             &kp SPACE         &kp RET           &mo 6             &kp LGUI          &kp C_PLAY_PAUSE
         >;
+#endif
         sensor-bindings = <&inc_dec_kp C_VOL_UP C_VOL_DN &scroll_vertical>;
       };
 
+/* LAYER 1 — QWERTY (or COL-DH if QWERTY was promoted) **********************/
+
       layout_layer_1 {
+#if DEFAULT_TYPING_LAYER == 1
+        display-name ="COL-DH";
+        bindings = <
+          &trans                &kp Q             &kp W             &kp F             &kp P             &kp B             &kp J             &kp L             &kp U             &kp Y             &kp SEMI              &trans
+          &trans                &kp A             &kp R             &kp S             &kp T             &kp G             &kp M             &kp N             &kp E             &kp I             &kp O                 &kp SQT
+          &trans                &kp Z             &kp X             &kp C             &kp D             &kp V             &kp K             &kp H             &kp COMMA         &kp DOT           &kp FSLH              &trans
+                                                  &trans            &trans            &trans            &trans            &trans            &trans            &trans            &trans
+        >;
+#else
         display-name ="QWERTY";
         bindings = <
           &trans                &kp Q             &kp W             &kp E             &kp R             &kp T             &kp Y             &kp U             &kp I             &kp O             &kp P                 &trans
@@ -126,10 +177,22 @@
           &trans                &kp Z             &kp X             &kp C             &kp V             &kp B             &kp N             &kp M             &kp COMMA         &kp DOT           &kp FSLH              &trans
                                                   &trans            &trans            &trans            &trans            &trans            &trans            &trans            &trans
         >;
+#endif
         sensor-bindings = <&inc_dec_kp C_VOL_UP C_VOL_DN &scroll_vertical>;
       };
 
+/* LAYER 2 — DVORAK (or COL-DH if DVORAK was promoted) **********************/
+
       layout_layer_2 {
+#if DEFAULT_TYPING_LAYER == 2
+        display-name ="COL-DH";
+        bindings = <
+          &trans                &kp Q             &kp W             &kp F             &kp P             &kp B             &kp J             &kp L             &kp U             &kp Y             &kp SEMI              &trans
+          &trans                &kp A             &kp R             &kp S             &kp T             &kp G             &kp M             &kp N             &kp E             &kp I             &kp O                 &kp SQT
+          &trans                &kp Z             &kp X             &kp C             &kp D             &kp V             &kp K             &kp H             &kp COMMA         &kp DOT           &kp FSLH              &trans
+                                                  &trans            &trans            &trans            &trans            &trans            &trans            &trans            &trans
+        >;
+#else
         display-name ="DVORAK";
         bindings = <
           &trans                &kp SQT           &kp COMMA         &kp DOT           &kp P             &kp Y             &kp F             &kp G             &kp C             &kp R             &kp L                 &trans
@@ -137,10 +200,22 @@
           &trans                &kp SEMI          &kp Q             &kp J             &kp K             &kp X             &kp B             &kp M             &kp W             &kp V             &kp Z                 &trans
                                                   &trans            &trans            &trans            &trans            &trans            &trans            &trans            &trans
         >;
+#endif
         sensor-bindings = <&inc_dec_kp C_VOL_UP C_VOL_DN &scroll_vertical>;
       };
 
+/* LAYER 3 — WORKMAN (or COL-DH if WORKMAN was promoted) *********************/
+
       layout_layer_3 {
+#if DEFAULT_TYPING_LAYER == 3
+        display-name ="COL-DH";
+        bindings = <
+          &trans                &kp Q             &kp W             &kp F             &kp P             &kp B             &kp J             &kp L             &kp U             &kp Y             &kp SEMI              &trans
+          &trans                &kp A             &kp R             &kp S             &kp T             &kp G             &kp M             &kp N             &kp E             &kp I             &kp O                 &kp SQT
+          &trans                &kp Z             &kp X             &kp C             &kp D             &kp V             &kp K             &kp H             &kp COMMA         &kp DOT           &kp FSLH              &trans
+                                                  &trans            &trans            &trans            &trans            &trans            &trans            &trans            &trans
+        >;
+#else
         display-name ="WRKMN";
         bindings = <
           &trans                &kp Q             &kp D             &kp R             &kp W             &kp B             &kp J             &kp F             &kp U             &kp P             &kp SEMI              &trans
@@ -148,10 +223,22 @@
           &trans                &kp Z             &kp X             &kp M             &kp C             &kp V             &kp K             &kp L             &kp COMMA         &kp DOT           &kp FSLH              &trans
                                                   &trans            &trans            &trans            &trans            &trans            &trans            &trans            &trans
         >;
+#endif
         sensor-bindings = <&inc_dec_kp C_VOL_UP C_VOL_DN &scroll_vertical>;
       };
 
+/* LAYER 4 — COLEMAK (or COL-DH if COLEMAK was promoted) ********************/
+
       layout_layer_4 {
+#if DEFAULT_TYPING_LAYER == 4
+        display-name ="COL-DH";
+        bindings = <
+          &trans                &kp Q             &kp W             &kp F             &kp P             &kp B             &kp J             &kp L             &kp U             &kp Y             &kp SEMI              &trans
+          &trans                &kp A             &kp R             &kp S             &kp T             &kp G             &kp M             &kp N             &kp E             &kp I             &kp O                 &kp SQT
+          &trans                &kp Z             &kp X             &kp C             &kp D             &kp V             &kp K             &kp H             &kp COMMA         &kp DOT           &kp FSLH              &trans
+                                                  &trans            &trans            &trans            &trans            &trans            &trans            &trans            &trans
+        >;
+#else
         display-name ="COLMAK";
         bindings = <
           &trans                &kp Q             &kp W             &kp F             &kp P             &kp G             &kp J             &kp L             &kp U             &kp Y             &kp SEMI              &trans
@@ -159,6 +246,7 @@
           &trans                &kp Z             &kp X             &kp C             &kp V             &kp B             &kp K             &kp M             &kp COMMA         &kp DOT           &kp FSLH              &trans
                                                   &trans            &trans            &trans            &trans            &trans            &trans            &trans            &trans
         >;
+#endif
         sensor-bindings = <&inc_dec_kp C_VOL_UP C_VOL_DN &scroll_vertical>;
       };
 

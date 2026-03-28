@@ -1,16 +1,139 @@
 name: Build ZMK firmware
 
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - 'config/**'
-      - 'boards/**'
-      - 'zephyr/**'
-      - 'build.yaml'
   workflow_dispatch:
+    inputs:
+      build_colemak_dh:
+        description: "Include Colemak-DH"
+        type: boolean
+        default: true
+      build_qwerty:
+        description: "Include QWERTY"
+        type: boolean
+        default: true
+      build_dvorak:
+        description: "Include Dvorak"
+        type: boolean
+        default: true
+      build_workman:
+        description: "Include Workman"
+        type: boolean
+        default: true
+      build_colemak:
+        description: "Include Colemak"
+        type: boolean
+        default: true
+      include_reset:
+        description: "Include Reset Firmware"
+        type: boolean
+        default: true
+      create_release:
+        description: "Draft Release"
+        type: boolean
+        default: true
 
 jobs:
   build:
+    name: Build
     uses: zmkfirmware/zmk/.github/workflows/build-user-config.yml@v0.3
+
+  release:
+    name: Draft Release
+    if: inputs.create_release
+    needs: [build]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download firmware artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Create per-layout zips
+        env:
+          BUILD_COLEMAK_DH: ${{ inputs.build_colemak_dh }}
+          BUILD_QWERTY: ${{ inputs.build_qwerty }}
+          BUILD_DVORAK: ${{ inputs.build_dvorak }}
+          BUILD_WORKMAN: ${{ inputs.build_workman }}
+          BUILD_COLEMAK: ${{ inputs.build_colemak }}
+          INCLUDE_RESET: ${{ inputs.include_reset }}
+        run: |
+          mkdir -p release
+
+          declare -A layout_enabled
+          layout_enabled[colemak_dh]="$BUILD_COLEMAK_DH"
+          layout_enabled[qwerty]="$BUILD_QWERTY"
+          layout_enabled[dvorak]="$BUILD_DVORAK"
+          layout_enabled[workman]="$BUILD_WORKMAN"
+          layout_enabled[colemak]="$BUILD_COLEMAK"
+
+          # Group .uf2 files by layout
+          for file in artifacts/firmware/*.uf2; do
+            [ -f "$file" ] || continue
+            basename=$(basename "$file")
+            layout=$(echo "$basename" | sed 's/^left_corne_eclipse_//;s/^right_corne_eclipse_//;s/\.zmk\.uf2$//')
+
+            if [ "${layout_enabled[$layout]}" = "true" ]; then
+              mkdir -p "staging/$layout"
+              cp "$file" "staging/$layout/"
+            fi
+          done
+
+          # Zip each enabled layout
+          if [ -d staging ]; then
+            for layout_dir in staging/*/; do
+              layout=$(basename "$layout_dir")
+              zip -j "release/corne_eclipse_${layout}.zip" "$layout_dir"*
+            done
+          fi
+
+          # Include reset firmware if enabled
+          if [ "$INCLUDE_RESET" = "true" ]; then
+            cp firmware-reference/settings_reset-nice_nano_v2-zmk.uf2 release/
+          fi
+
+          echo "Release contents:"
+          ls -la release/
+
+      - name: Generate release notes
+        id: notes
+        run: |
+          # Get the latest release tag (if any)
+          LAST_TAG=$(gh release list --limit 1 --json tagName --jq '.[0].tagName' 2>/dev/null || echo "")
+
+          if [ -n "$LAST_TAG" ] && git rev-parse "$LAST_TAG" >/dev/null 2>&1; then
+            COMMITS=$(git log "$LAST_TAG"..HEAD --pretty=format:"- [%h](https://github.com/${{ github.repository }}/commit/%H) %s" --)
+          else
+            COMMITS=$(git log --pretty=format:"- [%h](https://github.com/${{ github.repository }}/commit/%H) %s" --)
+          fi
+
+          if [ -z "$COMMITS" ]; then
+            COMMITS="- No new commits since last release"
+          fi
+
+          EOF_MARKER=$(dd if=/dev/urandom bs=15 count=1 status=none | base64)
+          echo "commits<<$EOF_MARKER" >> "$GITHUB_OUTPUT"
+          echo "$COMMITS" >> "$GITHUB_OUTPUT"
+          echo "$EOF_MARKER" >> "$GITHUB_OUTPUT"
+        env:
+          GH_TOKEN: ${{ github.token }}
+
+      - name: Create draft release
+        uses: softprops/action-gh-release@v2
+        with:
+          draft: true
+          tag_name: build-${{ github.run_number }}
+          name: Firmware Build ${{ github.run_number }}
+          files: release/*
+          body: |
+            ${{ steps.notes.outputs.commits }}
+
+            ---
+
+            Each zip contains left and right `.uf2` firmware files. Extract the zip and flash the appropriate file to each keyboard half.
+
+            The settings reset firmware is also included. If your hardware is misbehaving, you can flash this to both sides before flashing your desired firmware. [Click here to learn about flashing firmware](https://github.com/${{ github.repository }}/blob/main/FLASHING.md).

@@ -38,8 +38,13 @@ To revert to the firmware's default keymap, use the "Restore Stock Settings" opt
 ## Keyboard Layers
 
 This is my custom SAMURAI layout, designed for gaming, programming, and swift
-touch typing. The default typing layer is Colemak DH. A QWERTY-first variant
-is also available on the [releases](https://github.com/Frosthaven/zmk-config-corne-eclipse/releases) page.
+touch typing. The default typing layer is Colemak DH. A QWERTY-first variant is
+also available on the
+[releases](https://github.com/Frosthaven/zmk-config-corne-eclipse/releases)
+page.
+
+Regardless of which layout default you install, you can use the system layer to
+swap to another at anytime.
 
 ![Typing Layer](/assets/images/samurai-legend-typing.png)
 

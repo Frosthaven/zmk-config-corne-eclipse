@@ -1,8 +1,55 @@
 ---
 include:
+  # Colemak-DH
   - board: nice_nano_v2
     shield: corne_eclipse_left eclipse_nice_view_adapter_trrs nice_view
     snippet: studio-rpc-usb-uart
     cmake-args: -DCONFIG_ZMK_STUDIO=y
+    artifact-name: left_corne_eclipse_colemak_dh.zmk
   - board: nice_nano_v2
     shield: corne_eclipse_right eclipse_nice_view_adapter_trrs nice_view
+    artifact-name: right_corne_eclipse_colemak_dh.zmk
+
+  # QWERTY
+  - board: nice_nano_v2
+    shield: corne_eclipse_left eclipse_nice_view_adapter_trrs nice_view
+    snippet: studio-rpc-usb-uart
+    cmake-args: -DCONFIG_ZMK_STUDIO=y -DDEFAULT_TYPING_LAYER=1
+    artifact-name: left_corne_eclipse_qwerty.zmk
+  - board: nice_nano_v2
+    shield: corne_eclipse_right eclipse_nice_view_adapter_trrs nice_view
+    cmake-args: -DDEFAULT_TYPING_LAYER=1
+    artifact-name: right_corne_eclipse_qwerty.zmk
+
+  # Dvorak
+  - board: nice_nano_v2
+    shield: corne_eclipse_left eclipse_nice_view_adapter_trrs nice_view
+    snippet: studio-rpc-usb-uart
+    cmake-args: -DCONFIG_ZMK_STUDIO=y -DDEFAULT_TYPING_LAYER=2
+    artifact-name: left_corne_eclipse_dvorak.zmk
+  - board: nice_nano_v2
+    shield: corne_eclipse_right eclipse_nice_view_adapter_trrs nice_view
+    cmake-args: -DDEFAULT_TYPING_LAYER=2
+    artifact-name: right_corne_eclipse_dvorak.zmk
+
+  # Workman
+  - board: nice_nano_v2
+    shield: corne_eclipse_left eclipse_nice_view_adapter_trrs nice_view
+    snippet: studio-rpc-usb-uart
+    cmake-args: -DCONFIG_ZMK_STUDIO=y -DDEFAULT_TYPING_LAYER=3
+    artifact-name: left_corne_eclipse_workman.zmk
+  - board: nice_nano_v2
+    shield: corne_eclipse_right eclipse_nice_view_adapter_trrs nice_view
+    cmake-args: -DDEFAULT_TYPING_LAYER=3
+    artifact-name: right_corne_eclipse_workman.zmk
+
+  # Colemak
+  - board: nice_nano_v2
+    shield: corne_eclipse_left eclipse_nice_view_adapter_trrs nice_view
+    snippet: studio-rpc-usb-uart
+    cmake-args: -DCONFIG_ZMK_STUDIO=y -DDEFAULT_TYPING_LAYER=4
+    artifact-name: left_corne_eclipse_colemak.zmk
+  - board: nice_nano_v2
+    shield: corne_eclipse_right eclipse_nice_view_adapter_trrs nice_view
+    cmake-args: -DDEFAULT_TYPING_LAYER=4
+    artifact-name: right_corne_eclipse_colemak.zmk
