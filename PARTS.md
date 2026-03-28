@@ -1,4 +1,4 @@
-[README](README.md) | Parts | [Fabrication](FABRICATION.md) | [Building](BUILDING.md) | [Tricks](TRICKS.md)
+[README](README.md) | [Keymap](KEYMAP.md) | Parts | [Fabrication](FABRICATION.md) | [Building](BUILDING.md) | [Tricks](TRICKS.md)
 
 # Parts
 

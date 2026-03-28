@@ -134,6 +134,4 @@ jobs:
 
             ---
 
-            Each zip contains left and right `.uf2` firmware files. Extract the zip and flash the appropriate file to each keyboard half.
-
-            The settings reset firmware is also included. If your hardware is misbehaving, you can flash this to both sides before flashing your desired firmware. [Click here to learn about flashing firmware](https://github.com/${{ github.repository }}/blob/main/FLASHING.md).
+            Each zip contains left and right `.uf2` firmware files. Extract the zip and follow the [flashing guide](https://github.com/${{ github.repository }}/blob/main/FLASHING.md) to install.

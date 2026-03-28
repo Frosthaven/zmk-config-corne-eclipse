@@ -1,6 +1,9 @@
-[README](README.md) | [Parts](PARTS.md) | Fabrication | [Building](BUILDING.md) | [Tricks](TRICKS.md)
+[README](README.md) | [Keymap](KEYMAP.md) | [Parts](PARTS.md) | Fabrication | [Building](BUILDING.md) | [Tricks](TRICKS.md)
 
 # Fabrication
+
+While the [parts](PARTS.md) page covers items you can buy, this page documents
+what needs to be created.
 
 The circuit board, plates, and shields need to be fabricated by a PCB and 3D
 printing company like [Elecrow](https://www.elecrow.com/),
