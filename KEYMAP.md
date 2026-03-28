@@ -13,7 +13,7 @@ limitations on the [official documentation page](https://zmk.dev/docs/features/s
 1. Connect the left half via USB
 2. Make sure the keyboard is in USB mode (use the `BT or USB` key on the `SYSTEM` layer to toggle)
 3. Open ZMK Studio and connect
-4. When prompted to unlock, press the `ZMK Studio` key on the `SYSTEM` layer
+4. When prompted to unlock, press the `ZMK AUTH` key on the `SYSTEM` layer
 
 On Linux, you may need serial port access (log out and back in after):
 
