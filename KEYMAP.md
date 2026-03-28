@@ -58,3 +58,18 @@ be different on your board based on the default typing layer you installed. The
 first typing layer choice will always be your default layout.*
 
 ![Utility Layer](/assets/images/samurai-legend-utility.png)
+
+### MacOS Specific Notes
+
+While you can use the above as-is, I personally prefer swapping control and
+command when connecting to a mac. This allows copy/cut/paste etc to feel more
+natural.
+
+- Head over to System Settings → Keyboard
+- Click on the `Keyboard Shortcuts` button
+- Click on the `Modifier Keys`
+  - Select the keyboard named `Corne Eclipse`
+  - Set `Control key` to `Command`
+  - Set `Command key` to `Control`
+
+![Mac Keyboard Modifiers Settings](/assets/images/mac-rebind-modifiers)
