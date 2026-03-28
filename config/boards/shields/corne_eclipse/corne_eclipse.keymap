@@ -47,13 +47,13 @@
       compatible = "zmk,behavior-sensor-rotate";
       #sensor-binding-cells = <0>;
       bindings = <&msc SCRL_UP>, <&msc SCRL_DOWN>;
-      tap-ms = <50>;
+      tap-ms = <100>;
     };
     scroll_horizontal: scroll_horizontal {
       compatible = "zmk,behavior-sensor-rotate";
       #sensor-binding-cells = <0>;
       bindings = <&msc SCRL_LEFT>, <&msc SCRL_RIGHT>;
-      tap-ms = <50>;
+      tap-ms = <100>;
     };
   };
 
