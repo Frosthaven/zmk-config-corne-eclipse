@@ -59,7 +59,7 @@ first typing layer choice will always be your default layout.*
 
 ![Utility Layer](/assets/images/samurai-legend-utility.png)
 
-### MacOS Specific Notes
+## MacOS Specific Notes
 
 While you can use the above as-is, I personally prefer swapping control and
 command when connecting to a mac. This allows copy/cut/paste etc to feel more
