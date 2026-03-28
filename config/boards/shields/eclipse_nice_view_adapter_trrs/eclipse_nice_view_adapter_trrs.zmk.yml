@@ -1,0 +1,7 @@
+file_format: "1"
+id: eclipse_nice_view_adapter_trrs
+name: Eclipse nice!view adapter (TRRS)
+type: shield
+url: https://nicekeyboards.com/nice-view
+requires: [i2c_oled]
+exposes: [nice_view_header]

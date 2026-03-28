@@ -1,0 +1,5 @@
+# Copyright (c) 2022 The ZMK Contributors
+# SPDX-License-Identifier: MIT
+
+config SHIELD_ECLIPSE_NICE_VIEW_ADAPTER_TRRS
+    def_bool $(shields_list_contains,eclipse_nice_view_adapter_trrs)
