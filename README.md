@@ -2,7 +2,7 @@ README | [Keymap](KEYMAP.md) | [Parts](PARTS.md) | [Fabrication](FABRICATION.md)
 
 # Corne Eclipse
 
-![Corne Eclipse Front And Back](/assets/images/corne-eclipse.jpg)
+![Corne Eclipse Front And Back](/assets/images/corne-eclipse.png)
 
 The Corne Eclipse is a highly customized wireless Corne MX with the following:
 
