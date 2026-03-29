@@ -18,7 +18,7 @@ limitations on the [official documentation page](https://zmk.dev/docs/features/s
 On Linux, you may need serial port access (log out and back in after):
 
 ```bash
-sudo usermod -aG uucp $USER` and re-login.
+sudo usermod -aG uucp $USER
 ```
 
 ### Reset To Firmware Default Keymap
