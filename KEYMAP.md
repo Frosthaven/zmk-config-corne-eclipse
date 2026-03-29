@@ -1,5 +1,22 @@
 [README](README.md) | Keymap | [Parts](PARTS.md) | [Fabrication](FABRICATION.md) | [Building](BUILDING.md) | [Tricks](TRICKS.md)
 
+## Keymap
+
+Inspired by Cyberpunk's story of Johnny Silverhand, the Corne Eclipse comes with
+the SAMURAI layout. I've used this layout since 2020 to slay everything from
+video game corporations in a dystopian city to software development on the job.
+
+The strategy I used when developing this layout is much like the strategy used
+by vim/neovim: keep keys grouped by concept as much as possible. You can see
+this in part by how movement is managed:
+
+- The same key locations for movement in video games are reused for the arrow
+  keys and again for mouse direction.
+- The numpad is layed out like a full keyboard's numpad.
+
+With this strategy, it makes leveraging all of the keys a lot more intuitive
+than it seems at first glance.
+
 ## ZMK Studio
 
 ![ZMK Studio](/assets/images/zmk-studio.png)
@@ -27,16 +44,6 @@ To revert to the firmware's default keymap, use the "Restore Stock Settings"
 option in ZMK Studio.
 
 ## Keyboard Layers
-
-The Corne Eclipse comes with the SAMURAI layout. I designed this layout in 2020
-in an attempt to bridge the three mental models I was often in - Programming,
-gaming, or productivity. I've used this layout ever since, and have slain
-everything from dragons to spreadsheets with it.
-
-The strategy in these key placements is to keep concepts structured in similar
-ways - such as navigation arrows matching game navigation arrow locations across
-all types. Once you get used to the concepts, its much less mental overhead to
-remember where keys are!
 
 ### Typing Layers
 
