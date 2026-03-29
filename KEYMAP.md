@@ -76,8 +76,8 @@ natural.
 
 ## Linux Specific Notes
 
-The emoji key on the symbol layer is a macro that presses the keys necessary to
-launch the emoji picker on Windows and on MacOS. For linux, you may need to
+The emoji key on the `NAVSYM` layer is a macro that presses the keys necessary
+to launch the emoji picker on Windows and on MacOS. For linux, you may need to
 assign this key to your emoji picker of choice if one is not already assigned
 (I'm a big fan of `smile` under Wayland). When pressed the shortcut will likely
 be detected as `Super + period`.
