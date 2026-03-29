@@ -226,22 +226,22 @@
       };
 
       lower_layer {
-        display-name ="SYMBOL";
+        display-name ="NAVSYM";
         bindings = <
-          &kp ESC               &kp F1            &kp F2            &kp F3            &kp F4            &kp F5            &kp GRAVE         &kp EXCL          &kp AMPS          &kp AT            &kp HASH              &kp DEL
-          &macro_caps           &kp F6            &kp F7            &kp F8            &kp F9            &kp F10           &kp DLLR          &kp LPAR          &kp LBRC          &kp LBKT          &kp PIPE              &kp CARET
-          &kp LSHFT             &kp F11           &kp F12           &kp F13           &kp F14           &kp F15           &kp UNDER         &kp RPAR          &kp RBRC          &kp RBKT          &kp BACKSLASH         &kp TILDE
+          &kp ESC               &kp HOME          &kp UP            &kp END           &kp PG_UP         &kp INSERT        &kp GRAVE         &kp EXCL          &kp AMPS          &kp AT            &kp HASH              &kp DEL
+          &macro_caps           &kp LEFT          &kp DOWN          &kp RIGHT         &kp PG_DN         &kp PAUSE_BREAK   &kp DLLR          &kp LPAR          &kp LBRC          &kp LBKT          &kp PIPE              &kp CARET
+          &kp LSHFT             &kp C_PREV        &kp C_PLAY_PAUSE  &kp C_NEXT        &none             &none             &kp UNDER         &kp RPAR          &kp RBRC          &kp RBKT          &kp BACKSLASH         &kp TILDE
                                                   &trans            &macro_emoji      &trans            &trans            &trans            &mo 7             &kp K_APP         &trans
         >;
         sensor-bindings = <&inc_dec_kp C_VOL_UP C_VOL_DN &scroll_horizontal>;
       };
 
       raise_layer {
-        display-name ="NAVPAD";
+        display-name ="MSENUM";
         bindings = <
-          &kp ESC               &kp HOME          &kp UP            &kp END           &kp PG_UP         &kp INSERT        &kp PSCRN         &kp N7            &kp N8            &kp N9            &kp KP_DIVIDE          &kp KP_MULTIPLY
-          &macro_caps           &kp LEFT          &kp DOWN          &kp RIGHT         &kp PG_DN         &kp PAUSE_BREAK   &kp SCROLLLOCK    &kp N4            &kp N5            &kp N6            &kp MINUS              &kp PLUS
-          &kp LSHFT             &none             &none             &none             &none             &none             &kp KP_NUMLOCK    &kp N1            &kp N2            &kp N3            &kp PERCENT            &kp EQUAL
+          &kp ESC               &mkp LCLK         &mmv MOVE_UP      &mkp RCLK         &none             &none             &kp PSCRN         &kp N7            &kp N8            &kp N9            &kp KP_DIVIDE          &kp KP_MULTIPLY
+          &macro_caps           &mmv MOVE_LEFT    &mmv MOVE_DOWN    &mmv MOVE_RIGHT   &none             &none             &kp SCROLLLOCK    &kp N4            &kp N5            &kp N6            &kp MINUS              &kp PLUS
+          &kp LSHFT             &none             &mkp MCLK         &none             &none             &none             &kp KP_NUMLOCK    &kp N1            &kp N2            &kp N3            &kp PERCENT            &kp EQUAL
                                                   &trans            &trans            &mo 7             &trans            &kp KP_ENTER      &trans            &kp N0            &trans
         >;
         sensor-bindings = <&inc_dec_kp C_VOL_UP C_VOL_DN &scroll_horizontal>;
@@ -250,9 +250,9 @@
       adjust_layer {
         display-name ="SYSTEM";
         bindings = <
-          &bt BT_CLR            &mkp LCLK         &mmv MOVE_UP      &mkp RCLK         &mkp MCLK         &kp C_BRI_INC     &bt BT_SEL 0      &bt BT_SEL 1      &bt BT_SEL 2      &bt BT_SEL 3      &bt BT_SEL 4          &bt BT_CLR
-          &bootloader           &mmv MOVE_LEFT    &mmv MOVE_DOWN    &mmv MOVE_RIGHT   &none             &kp C_BRI_DEC     &out OUT_TOG      &studio_unlock    &none             &none             &none                 &bootloader
-          &sys_reset            &kp C_PREV        &kp C_PLAY_PAUSE  &kp C_NEXT        &kp C_STOP        &none             &to 0             &to 1             &to 2             &to 3             &to 4                 &sys_reset
+          &bt BT_CLR            &kp F1            &kp F2            &kp F3            &kp F4            &kp F5            &bt BT_SEL 0      &bt BT_SEL 1      &bt BT_SEL 2      &bt BT_SEL 3      &bt BT_SEL 4          &bt BT_CLR
+          &bootloader           &kp F6            &kp F7            &kp F8            &kp F9            &kp F10           &out OUT_TOG      &studio_unlock    &kp C_BRI_INC     &kp C_BRI_DEC     &none                 &bootloader
+          &sys_reset            &kp F11           &kp F12           &kp F13           &kp F14           &kp F15           &to 0             &to 1             &to 2             &to 3             &to 4                 &sys_reset
                                                   &trans            &trans            &trans            &trans            &trans            &trans            &trans            &trans
         >;
         sensor-bindings = <&inc_dec_kp C_VOL_UP C_VOL_DN &scroll_horizontal>;
