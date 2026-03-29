@@ -28,10 +28,10 @@ option in ZMK Studio.
 
 ### Tips
 
-The firmare grants 5 separate typing layer toggles. While I recommend keeping
+The firmare grants 5 separate typing layout toggles. While I recommend keeping
 QWERTY around even for Colemak-DH enthusiasts like me, that leaves 3-4 extra
-layers available that you may never need. This is a great place to shove a lot
-of custom keyboard modes into your setup.
+layers available that you may never need. Feel free to replace these with your
+own.
 
 ## Keyboard Layers
 
@@ -40,12 +40,19 @@ in an attempt to bridge the three mental models I was often in - Programming,
 gaming, or productivity. I've used this layout ever since, and have slain
 everything from dragons to spreadsheets with it.
 
-The default typing layer is decided by which firmware package you install from
-the [releases](https://github.com/Frosthaven/zmk-config-corne-eclipse/releases)
-page.
+Beyond your default typing layout, you can activate layouts 2, 3, 4, and 5 on
+the `SYSTEM` layer. By default all layouts are filled with alternative keymaps:
 
-Regardless of which layout you install as the default, you can use the system
-layer to swap to another at anytime.
+- QWERTY
+- Colemak-DH
+- Colemak
+- Dvorak
+- Workman
+
+The default typing layout is decided by which firmware package you install from
+the [releases](https://github.com/Frosthaven/zmk-config-corne-eclipse/releases)
+page. You can always return to your default layout by pressing the `LAYOUT 1`
+key on the `SYSTEM LAYER`.
 
 ### Typing Layers
 
