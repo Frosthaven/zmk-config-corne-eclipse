@@ -26,19 +26,19 @@ sudo usermod -aG uucp $USER
 To revert to the firmware's default keymap, use the "Restore Stock Settings"
 option in ZMK Studio.
 
-### Tips
-
-The firmare grants 5 separate typing layout toggles. While I recommend keeping
-QWERTY around even for Colemak-DH enthusiasts like me, that leaves 3-4 extra
-layers available that you may never need. Feel free to replace these with your
-own.
-
 ## Keyboard Layers
 
 The Corne Eclipse comes with the SAMURAI layout. I designed this layout in 2020
 in an attempt to bridge the three mental models I was often in - Programming,
 gaming, or productivity. I've used this layout ever since, and have slain
 everything from dragons to spreadsheets with it.
+
+The strategy in these key placements is to keep concepts structured in similar
+ways - such as navigation arrows matching game navigation arrow locations across
+all types. Once you get used to the concepts, its much less mental overhead to
+remember where keys are!
+
+### Typing Layers
 
 Beyond your default typing layout, you can activate layouts 2, 3, 4, and 5 on
 the `SYSTEM` layer. By default all layouts are filled with alternative keymaps:
@@ -54,15 +54,9 @@ the [releases](https://github.com/Frosthaven/zmk-config-corne-eclipse/releases)
 page. You can always return to your default layout by pressing the `LAYOUT 1`
 key on the `SYSTEM LAYER`.
 
-### Typing Layers
-
 ![Typing Layer](/assets/images/samurai-legend-typing.png)
 
 ### Utility Layers
-
-*Note: The order of the typing layer toggles on the system layer shown below may
-be different on your board based on the default typing layer you installed. The
-first typing layer choice will always be your default layout.*
 
 ![Utility Layer](/assets/images/samurai-legend-utility.png)
 
