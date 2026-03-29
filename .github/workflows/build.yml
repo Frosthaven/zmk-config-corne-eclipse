@@ -54,7 +54,7 @@ jobs:
         id: notes
         run: |
           # Get the latest release tag (if any)
-          LAST_TAG=$(gh release list --limit 1 --json tagName --jq '.[0].tagName' 2>/dev/null || echo "")
+          LAST_TAG=$(gh release list --exclude-drafts --limit 1 --json tagName --jq '.[0].tagName' 2>/dev/null || echo "")
 
           if [ -n "$LAST_TAG" ] && git rev-parse "$LAST_TAG" >/dev/null 2>&1; then
             COMMITS=$(git log "$LAST_TAG"..HEAD --pretty=format:"- [%h](https://github.com/${{ github.repository }}/commit/%H) %s" --)
@@ -86,3 +86,5 @@ jobs:
             ---
 
             Each zip contains left and right `.uf2` firmware files. Extract the zip and follow the [flashing guide](https://github.com/${{ github.repository }}/blob/main/FLASHING.md) to install.
+
+            [Click here to view the keymap for this release](https://raw.githubusercontent.com/${{ github.repository }}/${{ github.sha }}/assets/images/samurai-legend-utility.png)
