@@ -89,6 +89,8 @@ jobs:
 
             Each zip contains left and right `.uf2` firmware files. Extract the zip and follow the [flashing guide](https://github.com/${{ github.repository }}/blob/main/FLASHING.md) to install.
 
+            You can customize your keymap using [ZMK Studio](https://github.com/${{ github.repository }}/blob/main/KEYMAP.md#zmk-studio).
+
             Keymap Images:
             - [Typing Layers](https://raw.githubusercontent.com/${{ github.repository }}/${{ github.sha }}/assets/images/samurai-legend-typing.png)
             - [Utility Layers](https://raw.githubusercontent.com/${{ github.repository }}/${{ github.sha }}/assets/images/samurai-legend-utility.png)

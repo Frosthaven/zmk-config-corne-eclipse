@@ -12,13 +12,15 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 
 #include <zmk/battery.h>
 #include <zmk/display.h>
-#include <zmk/events/usb_conn_state_changed.h>
 #include <zmk/event_manager.h>
 #include <zmk/events/battery_state_changed.h>
 #include <zmk/split/bluetooth/peripheral.h>
 #include <zmk/events/split_peripheral_status_changed.h>
-#include <zmk/usb.h>
 #include <zmk/ble.h>
+
+#if IS_ENABLED(CONFIG_NRFX_POWER)
+#include <hal/nrf_power.h>
+#endif
 
 #include "peripheral_status.h"
 
@@ -33,20 +35,34 @@ struct peripheral_status_state {
 static void draw_top(lv_obj_t *widget, lv_color_t cbuf[], const struct status_state *state) {
     lv_obj_t *canvas = lv_obj_get_child(widget, 0);
 
-    lv_draw_label_dsc_t label_dsc;
-    init_label_dsc(&label_dsc, LVGL_FOREGROUND, &lv_font_montserrat_16, LV_TEXT_ALIGN_RIGHT);
     lv_draw_rect_dsc_t rect_black_dsc;
     init_rect_dsc(&rect_black_dsc, LVGL_BACKGROUND);
+    lv_draw_rect_dsc_t rect_white_dsc;
+    init_rect_dsc(&rect_white_dsc, LVGL_FOREGROUND);
 
     // Fill background
     lv_canvas_draw_rect(canvas, 0, 0, CANVAS_SIZE, CANVAS_SIZE, &rect_black_dsc);
 
-    // Draw battery
-    draw_battery(canvas, state);
-
-    // Draw output status
-    lv_canvas_draw_text(canvas, 0, 0, CANVAS_SIZE, &label_dsc,
+    // Connection icon only (no text) - left side
+    lv_draw_label_dsc_t icon_dsc;
+    init_label_dsc(&icon_dsc, LVGL_FOREGROUND, &lv_font_montserrat_16, LV_TEXT_ALIGN_LEFT);
+    lv_canvas_draw_text(canvas, 2, 2, 18, &icon_dsc,
                         state->connected ? LV_SYMBOL_WIFI : LV_SYMBOL_CLOSE);
+
+    // Battery cell (right half). Charging signaled by the inverted-bg banner.
+    // Number rendered even during charge (voltage-based reading is inflated
+    // but user prefers seeing it). y=3 (vs icon y=2) visually centers the
+    // 14-pt number within the 16-pt icon's vertical footprint.
+    if (state->charging) {
+        lv_canvas_draw_rect(canvas, 34, 0, 34, 20, &rect_white_dsc);
+    }
+
+    lv_draw_label_dsc_t batt_label;
+    init_label_dsc(&batt_label, state->charging ? LVGL_BACKGROUND : LVGL_FOREGROUND,
+                   &lv_font_unscii_8, LV_TEXT_ALIGN_CENTER);
+    char batt_text[4];
+    snprintf(batt_text, sizeof(batt_text), "%d", state->battery);
+    lv_canvas_draw_text(canvas, 34, 6, 34, &batt_label, batt_text);
 
     // Rotate canvas
     rotate_canvas(canvas, cbuf);
@@ -54,10 +70,7 @@ static void draw_top(lv_obj_t *widget, lv_color_t cbuf[], const struct status_st
 
 static void set_battery_status(struct zmk_widget_status *widget,
                                struct battery_status_state state) {
-#if IS_ENABLED(CONFIG_USB_DEVICE_STACK)
     widget->state.charging = state.usb_present;
-#endif /* IS_ENABLED(CONFIG_USB_DEVICE_STACK) */
-
     widget->state.battery = state.level;
 
     draw_top(widget->obj, widget->cbuf, &widget->state);
@@ -71,9 +84,13 @@ static void battery_status_update_cb(struct battery_status_state state) {
 static struct battery_status_state battery_status_get_state(const zmk_event_t *eh) {
     return (struct battery_status_state) {
         .level = zmk_battery_state_of_charge(),
-#if IS_ENABLED(CONFIG_USB_DEVICE_STACK)
-        .usb_present = zmk_usb_is_powered(),
-#endif /* IS_ENABLED(CONFIG_USB_DEVICE_STACK) */
+#if IS_ENABLED(CONFIG_NRFX_POWER)
+        // CONFIG_ZMK_USB (and therefore zmk_usb_is_powered) isn't reachable on
+        // a split peripheral. Read VBUS straight from the POWER peripheral.
+        .usb_present = nrf_power_usbregstatus_vbusdet_get(NRF_POWER),
+#else
+        .usb_present = false,
+#endif
     };
 }
 
@@ -81,9 +98,6 @@ ZMK_DISPLAY_WIDGET_LISTENER(widget_battery_status, struct battery_status_state,
                             battery_status_update_cb, battery_status_get_state)
 
 ZMK_SUBSCRIPTION(widget_battery_status, zmk_battery_state_changed);
-#if IS_ENABLED(CONFIG_USB_DEVICE_STACK)
-ZMK_SUBSCRIPTION(widget_battery_status, zmk_usb_conn_state_changed);
-#endif /* IS_ENABLED(CONFIG_USB_DEVICE_STACK) */
 
 static struct peripheral_status_state get_state(const zmk_event_t *_eh) {
     return (struct peripheral_status_state){.connected = zmk_split_bt_peripheral_is_connected()};

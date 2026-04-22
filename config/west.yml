@@ -10,7 +10,8 @@ manifest:
       url-base: https://github.com/AYM1607
   projects:
     - name: zmk
-      remote: zmkfirmware
+      remote: frosthaven
+      revision: v0.3-peripheral-charging-bit
       import: app/west.yml
     - name: zmk-ext-power-smart-idle
       remote: frosthaven
