@@ -50,7 +50,8 @@ static void draw_top(lv_obj_t *widget, lv_color_t cbuf[], const struct status_st
                         state->connected ? LV_SYMBOL_WIFI : LV_SYMBOL_CLOSE);
 
     // Battery cell. While charging the voltage-based % is known-wrong, so show
-    // a centered bolt glyph instead of the number.
+    // a centered bolt glyph instead of the number. Right after unplug the
+    // cached number is still inflated until the cell relaxes; show ".." then.
     if (state->charging) {
         lv_canvas_draw_rect(canvas, 34, 0, 34, 20, &rect_white_dsc);
         lv_draw_label_dsc_t bolt_dsc;
@@ -60,7 +61,11 @@ static void draw_top(lv_obj_t *widget, lv_color_t cbuf[], const struct status_st
         lv_draw_label_dsc_t batt_label;
         init_label_dsc(&batt_label, LVGL_FOREGROUND, &lv_font_unscii_8, LV_TEXT_ALIGN_CENTER);
         char batt_text[4];
-        snprintf(batt_text, sizeof(batt_text), "%d", state->battery);
+        if (state->battery_stale) {
+            snprintf(batt_text, sizeof(batt_text), "..");
+        } else {
+            snprintf(batt_text, sizeof(batt_text), "%d", state->battery);
+        }
         lv_canvas_draw_text(canvas, 34, 6, 34, &batt_label, batt_text);
     }
 
@@ -70,7 +75,19 @@ static void draw_top(lv_obj_t *widget, lv_color_t cbuf[], const struct status_st
 
 static void set_battery_status(struct zmk_widget_status *widget,
                                struct battery_status_state state) {
+    bool was_charging = widget->state.charging;
     widget->state.charging = state.usb_present;
+
+    // Stale tracking — see status.c set_battery_status for the rationale.
+    static uint8_t stale_baseline;
+    if (was_charging && !state.usb_present) {
+        widget->state.battery_stale = true;
+        stale_baseline = widget->state.battery;
+    }
+    if (widget->state.battery_stale && state.level < stale_baseline) {
+        widget->state.battery_stale = false;
+    }
+
     widget->state.battery = state.level;
 
     draw_top(widget->obj, widget->cbuf, &widget->state);

@@ -94,7 +94,8 @@ static void draw_top(lv_obj_t *widget, lv_color_t cbuf[], const struct status_st
 
     // Battery row: left half = central, right half = peripheral. While
     // charging the voltage-based % is known-wrong, so show a centered bolt
-    // glyph instead of the number.
+    // glyph instead of the number. Right after unplug the cached number is
+    // still inflated until the cell voltage relaxes; show ".." in that window.
     if (state->charging) {
         lv_canvas_draw_rect(canvas, 0, 0, 34, 20, &rect_white_dsc);
         lv_draw_label_dsc_t bolt_dsc;
@@ -104,7 +105,11 @@ static void draw_top(lv_obj_t *widget, lv_color_t cbuf[], const struct status_st
         lv_draw_label_dsc_t batt_label;
         init_label_dsc(&batt_label, LVGL_FOREGROUND, &lv_font_unscii_8, LV_TEXT_ALIGN_CENTER);
         char left_batt[4];
-        snprintf(left_batt, sizeof(left_batt), "%d", state->battery);
+        if (state->battery_stale) {
+            snprintf(left_batt, sizeof(left_batt), "..");
+        } else {
+            snprintf(left_batt, sizeof(left_batt), "%d", state->battery);
+        }
         lv_canvas_draw_text(canvas, 0, 6, 34, &batt_label, left_batt);
     }
 
@@ -121,7 +126,11 @@ static void draw_top(lv_obj_t *widget, lv_color_t cbuf[], const struct status_st
         lv_draw_label_dsc_t pbatt_label;
         init_label_dsc(&pbatt_label, LVGL_FOREGROUND, &lv_font_unscii_8, LV_TEXT_ALIGN_CENTER);
         char right_batt[4];
-        snprintf(right_batt, sizeof(right_batt), "%d", state->peripheral_battery);
+        if (state->peripheral_battery_stale) {
+            snprintf(right_batt, sizeof(right_batt), "..");
+        } else {
+            snprintf(right_batt, sizeof(right_batt), "%d", state->peripheral_battery);
+        }
         lv_canvas_draw_text(canvas, 34, 6, 34, &pbatt_label, right_batt);
     }
 
@@ -275,7 +284,20 @@ static void draw_bottom(lv_obj_t *widget, lv_color_t cbuf[], const struct status
 static void set_battery_status(struct zmk_widget_status *widget,
                                struct battery_status_state state) {
 #if IS_ENABLED(CONFIG_USB_DEVICE_STACK)
+    bool was_charging = widget->state.charging;
     widget->state.charging = state.usb_present;
+
+    // On charging→not transition, mark the displayed level stale: the previous
+    // sample was taken under inflated charge voltage. Snapshot the level as a
+    // baseline; clear stale once a lower (relaxed-voltage) reading arrives.
+    static uint8_t stale_baseline;
+    if (was_charging && !state.usb_present) {
+        widget->state.battery_stale = true;
+        stale_baseline = widget->state.battery;
+    }
+    if (widget->state.battery_stale && state.level < stale_baseline) {
+        widget->state.battery_stale = false;
+    }
 #endif /* IS_ENABLED(CONFIG_USB_DEVICE_STACK) */
 
     widget->state.battery = state.level;
@@ -310,8 +332,19 @@ ZMK_SUBSCRIPTION(widget_battery_status, zmk_usb_conn_state_changed);
 #if IS_ENABLED(CONFIG_ZMK_SPLIT_BLE_CENTRAL_BATTERY_LEVEL_FETCHING)
 static void set_peripheral_battery_status(struct zmk_widget_status *widget,
                                           struct peripheral_battery_status_state state) {
-    widget->state.peripheral_battery = state.level;
+    bool was_charging = widget->state.peripheral_charging;
     widget->state.peripheral_charging = state.charging;
+
+    static uint8_t peripheral_stale_baseline;
+    if (was_charging && !state.charging) {
+        widget->state.peripheral_battery_stale = true;
+        peripheral_stale_baseline = widget->state.peripheral_battery;
+    }
+    if (widget->state.peripheral_battery_stale && state.level < peripheral_stale_baseline) {
+        widget->state.peripheral_battery_stale = false;
+    }
+
+    widget->state.peripheral_battery = state.level;
     widget->state.peripheral_connected = state.connected;
     draw_top(widget->obj, widget->cbuf, &widget->state);
 }
