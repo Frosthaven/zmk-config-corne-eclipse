@@ -95,49 +95,16 @@ static void draw_top(lv_obj_t *widget, lv_color_t cbuf[], const struct status_st
     // Battery row: left half = central, right half = peripheral. While
     // charging the voltage-based % is known-wrong, so show a centered bolt
     // glyph instead of the number. Right after unplug the cached number is
-    // still inflated until the cell voltage relaxes; show ".." in that window.
-    if (state->charging) {
-        lv_canvas_draw_rect(canvas, 0, 0, 34, 20, &rect_white_dsc);
-        lv_draw_label_dsc_t bolt_dsc;
-        init_label_dsc(&bolt_dsc, LVGL_BACKGROUND, &lv_font_montserrat_14, LV_TEXT_ALIGN_CENTER);
-        lv_canvas_draw_text(canvas, 0, 2, 34, &bolt_dsc, LV_SYMBOL_CHARGE);
-    } else {
-        lv_draw_label_dsc_t batt_label;
-        init_label_dsc(&batt_label, LVGL_FOREGROUND, &lv_font_unscii_16, LV_TEXT_ALIGN_CENTER);
-        char left_batt[4];
-        if (state->battery_stale) {
-            snprintf(left_batt, sizeof(left_batt), "..");
-        } else {
-            // Cap at 99: 100 is essentially never a real resting reading
-            // (charger drives the cell to 4.20 V, which only the LUT's top of
-            // the curve hits). Showing 99 avoids the misleading "perfect" look.
-            uint8_t lvl = state->battery > 99 ? 99 : state->battery;
-            snprintf(left_batt, sizeof(left_batt), "%d", lvl);
-        }
-        lv_canvas_draw_text(canvas, 0, 2, 34, &batt_label, left_batt);
-    }
+    // still inflated until the cell voltage relaxes; show two small centered
+    // dots in that window. Numeric percent uses Montserrat 12.
+    draw_batt_cell(canvas, 0,
+                   state->charging, state->battery, state->battery_stale, true,
+                   &rect_white_dsc);
 
-    if (!state->peripheral_connected) {
-        lv_draw_label_dsc_t disc_dsc;
-        init_label_dsc(&disc_dsc, LVGL_FOREGROUND, &lv_font_montserrat_14, LV_TEXT_ALIGN_CENTER);
-        lv_canvas_draw_text(canvas, 34, 2, 34, &disc_dsc, LV_SYMBOL_CLOSE);
-    } else if (state->peripheral_charging) {
-        lv_canvas_draw_rect(canvas, 34, 0, 34, 20, &rect_white_dsc);
-        lv_draw_label_dsc_t bolt_dsc;
-        init_label_dsc(&bolt_dsc, LVGL_BACKGROUND, &lv_font_montserrat_14, LV_TEXT_ALIGN_CENTER);
-        lv_canvas_draw_text(canvas, 34, 2, 34, &bolt_dsc, LV_SYMBOL_CHARGE);
-    } else {
-        lv_draw_label_dsc_t pbatt_label;
-        init_label_dsc(&pbatt_label, LVGL_FOREGROUND, &lv_font_unscii_16, LV_TEXT_ALIGN_CENTER);
-        char right_batt[4];
-        if (state->peripheral_battery_stale) {
-            snprintf(right_batt, sizeof(right_batt), "..");
-        } else {
-            uint8_t lvl = state->peripheral_battery > 99 ? 99 : state->peripheral_battery;
-            snprintf(right_batt, sizeof(right_batt), "%d", lvl);
-        }
-        lv_canvas_draw_text(canvas, 34, 2, 34, &pbatt_label, right_batt);
-    }
+    draw_batt_cell(canvas, 34,
+                   state->peripheral_charging, state->peripheral_battery,
+                   state->peripheral_battery_stale, state->peripheral_connected,
+                   &rect_white_dsc);
 
     // Rotate canvas
     rotate_canvas(canvas, cbuf);

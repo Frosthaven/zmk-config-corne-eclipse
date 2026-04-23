@@ -22,15 +22,20 @@ LOG_MODULE_DECLARE(zmk, CONFIG_ZMK_LOG_LEVEL);
 #include <hal/nrf_power.h>
 #endif
 
+#if IS_ENABLED(CONFIG_ZMK_SPLIT_BLE_CENTRAL_BATTERY_MIRROR)
+#include <zmk/events/central_battery_state_changed.h>
+#endif
+
 #include "peripheral_status.h"
 
-LV_IMG_DECLARE(samurai);
+LV_IMG_DECLARE(logo);
 
 static sys_slist_t widgets = SYS_SLIST_STATIC_INIT(&widgets);
 
 struct peripheral_status_state {
     bool connected;
 };
+
 
 static void draw_top(lv_obj_t *widget, lv_color_t cbuf[], const struct status_state *state) {
     lv_obj_t *canvas = lv_obj_get_child(widget, 0);
@@ -40,37 +45,25 @@ static void draw_top(lv_obj_t *widget, lv_color_t cbuf[], const struct status_st
     lv_draw_rect_dsc_t rect_white_dsc;
     init_rect_dsc(&rect_white_dsc, LVGL_FOREGROUND);
 
-    // Fill background
     lv_canvas_draw_rect(canvas, 0, 0, CANVAS_SIZE, CANVAS_SIZE, &rect_black_dsc);
 
-    // Connection icon only (no text) - left side
-    lv_draw_label_dsc_t icon_dsc;
-    init_label_dsc(&icon_dsc, LVGL_FOREGROUND, &lv_font_montserrat_16, LV_TEXT_ALIGN_LEFT);
-    lv_canvas_draw_text(canvas, 2, 2, 18, &icon_dsc,
-                        state->connected ? LV_SYMBOL_WIFI : LV_SYMBOL_CLOSE);
+#if IS_ENABLED(CONFIG_ZMK_SPLIT_BLE_CENTRAL_BATTERY_MIRROR)
+    /* Central cell: mark "disconnected" if we haven't heard from the
+     * central yet, or if the split link is currently down. */
+    bool central_cell_connected = state->connected && state->central_battery_received;
+    draw_batt_cell(canvas, 0, state->central_charging, state->central_battery,
+                   state->central_battery_stale, central_cell_connected,
+                   &rect_white_dsc);
+#else
+    /* Without the mirror feature, the central cell can't show real data;
+     * treat it as always-disconnected so the row still renders cleanly. */
+    draw_batt_cell(canvas, 0, false, 0, false, false, &rect_white_dsc);
+#endif
 
-    // Battery cell. While charging the voltage-based % is known-wrong, so show
-    // a centered bolt glyph instead of the number. Right after unplug the
-    // cached number is still inflated until the cell relaxes; show ".." then.
-    if (state->charging) {
-        lv_canvas_draw_rect(canvas, 34, 0, 34, 20, &rect_white_dsc);
-        lv_draw_label_dsc_t bolt_dsc;
-        init_label_dsc(&bolt_dsc, LVGL_BACKGROUND, &lv_font_montserrat_14, LV_TEXT_ALIGN_CENTER);
-        lv_canvas_draw_text(canvas, 34, 2, 34, &bolt_dsc, LV_SYMBOL_CHARGE);
-    } else {
-        lv_draw_label_dsc_t batt_label;
-        init_label_dsc(&batt_label, LVGL_FOREGROUND, &lv_font_unscii_16, LV_TEXT_ALIGN_CENTER);
-        char batt_text[4];
-        if (state->battery_stale) {
-            snprintf(batt_text, sizeof(batt_text), "..");
-        } else {
-            uint8_t lvl = state->battery > 99 ? 99 : state->battery;
-            snprintf(batt_text, sizeof(batt_text), "%d", lvl);
-        }
-        lv_canvas_draw_text(canvas, 34, 2, 34, &batt_label, batt_text);
-    }
+    /* Peripheral (own) cell. */
+    draw_batt_cell(canvas, 34, state->charging, state->battery, state->battery_stale,
+                   true, &rect_white_dsc);
 
-    // Rotate canvas
     rotate_canvas(canvas, cbuf);
 }
 
@@ -79,7 +72,6 @@ static void set_battery_status(struct zmk_widget_status *widget,
     bool was_charging = widget->state.charging;
     widget->state.charging = state.usb_present;
 
-    // Stale tracking — see status.c set_battery_status for the rationale.
     if (was_charging && !state.usb_present) {
         widget->state.battery_stale = true;
     } else if (widget->state.battery_stale) {
@@ -100,8 +92,6 @@ static struct battery_status_state battery_status_get_state(const zmk_event_t *e
     return (struct battery_status_state) {
         .level = zmk_battery_state_of_charge(),
 #if IS_ENABLED(CONFIG_NRFX_POWER)
-        // CONFIG_ZMK_USB (and therefore zmk_usb_is_powered) isn't reachable on
-        // a split peripheral. Read VBUS straight from the POWER peripheral.
         .usb_present = nrf_power_usbregstatus_vbusdet_get(NRF_POWER),
 #else
         .usb_present = false,
@@ -134,6 +124,53 @@ ZMK_DISPLAY_WIDGET_LISTENER(widget_peripheral_status, struct peripheral_status_s
                             output_status_update_cb, get_state)
 ZMK_SUBSCRIPTION(widget_peripheral_status, zmk_split_peripheral_status_changed);
 
+#if IS_ENABLED(CONFIG_ZMK_SPLIT_BLE_CENTRAL_BATTERY_MIRROR)
+
+struct central_battery_mirror_state {
+    uint8_t battery;
+    bool charging;
+};
+
+static void set_central_battery_status(struct zmk_widget_status *widget,
+                                       struct central_battery_mirror_state state) {
+    bool was_charging = widget->state.central_charging;
+    widget->state.central_charging = state.charging;
+
+    /* Same stale-handling as the own cell: on charging→not, show ".."
+     * until the next event with a relaxed reading arrives. */
+    if (was_charging && !state.charging) {
+        widget->state.central_battery_stale = true;
+    } else if (widget->state.central_battery_stale) {
+        widget->state.central_battery_stale = false;
+    }
+
+    widget->state.central_battery = state.battery;
+    widget->state.central_battery_received = true;
+
+    draw_top(widget->obj, widget->cbuf, &widget->state);
+}
+
+static void central_battery_update_cb(struct central_battery_mirror_state state) {
+    struct zmk_widget_status *widget;
+    SYS_SLIST_FOR_EACH_CONTAINER(&widgets, widget, node) {
+        set_central_battery_status(widget, state);
+    }
+}
+
+static struct central_battery_mirror_state central_battery_get_state(const zmk_event_t *eh) {
+    const struct zmk_central_battery_state_changed *ev = as_zmk_central_battery_state_changed(eh);
+    return (struct central_battery_mirror_state){
+        .battery  = ev ? ev->state_of_charge : 0,
+        .charging = ev ? ev->usb_powered    : false,
+    };
+}
+
+ZMK_DISPLAY_WIDGET_LISTENER(widget_central_battery, struct central_battery_mirror_state,
+                            central_battery_update_cb, central_battery_get_state)
+ZMK_SUBSCRIPTION(widget_central_battery, zmk_central_battery_state_changed);
+
+#endif // CONFIG_ZMK_SPLIT_BLE_CENTRAL_BATTERY_MIRROR
+
 int zmk_widget_status_init(struct zmk_widget_status *widget, lv_obj_t *parent) {
     widget->obj = lv_obj_create(parent);
     lv_obj_set_size(widget->obj, 160, 68);
@@ -142,12 +179,15 @@ int zmk_widget_status_init(struct zmk_widget_status *widget, lv_obj_t *parent) {
     lv_canvas_set_buffer(top, widget->cbuf, CANVAS_SIZE, CANVAS_SIZE, LV_IMG_CF_TRUE_COLOR);
 
     lv_obj_t *art = lv_img_create(widget->obj);
-    lv_img_set_src(art, &samurai);
+    lv_img_set_src(art, &logo);
     lv_obj_align(art, LV_ALIGN_TOP_LEFT, 0, 0);
 
     sys_slist_append(&widgets, &widget->node);
     widget_battery_status_init();
     widget_peripheral_status_init();
+#if IS_ENABLED(CONFIG_ZMK_SPLIT_BLE_CENTRAL_BATTERY_MIRROR)
+    widget_central_battery_init();
+#endif
 
     return 0;
 }

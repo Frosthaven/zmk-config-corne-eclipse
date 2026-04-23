@@ -67,3 +67,32 @@ void init_arc_dsc(lv_draw_arc_dsc_t *arc_dsc, lv_color_t color, uint8_t width) {
     arc_dsc->color = color;
     arc_dsc->width = width;
 }
+
+void draw_batt_cell(lv_obj_t *canvas, int x, bool charging, uint8_t battery,
+                    bool stale, bool connected, lv_draw_rect_dsc_t *rect_white) {
+    if (!connected) {
+        lv_draw_label_dsc_t dsc;
+        init_label_dsc(&dsc, LVGL_FOREGROUND, &lv_font_montserrat_14, LV_TEXT_ALIGN_CENTER);
+        lv_canvas_draw_text(canvas, x, 2, 34, &dsc, LV_SYMBOL_CLOSE);
+        return;
+    }
+    if (charging) {
+        lv_canvas_draw_rect(canvas, x, 0, 34, 20, rect_white);
+        lv_draw_label_dsc_t bolt;
+        init_label_dsc(&bolt, LVGL_BACKGROUND, &lv_font_montserrat_14, LV_TEXT_ALIGN_CENTER);
+        lv_canvas_draw_text(canvas, x, 2, 34, &bolt, LV_SYMBOL_CHARGE);
+        return;
+    }
+    if (stale) {
+        /* Two 3x3 dots, vertically centered in the 20-row cell. Hand-drawn
+         * rects so placement is pixel-exact regardless of font metrics. */
+        lv_canvas_draw_rect(canvas, x + 13, 9, 3, 3, rect_white);
+        lv_canvas_draw_rect(canvas, x + 19, 9, 3, 3, rect_white);
+        return;
+    }
+    lv_draw_label_dsc_t label;
+    init_label_dsc(&label, LVGL_FOREGROUND, &lv_font_montserrat_12, LV_TEXT_ALIGN_CENTER);
+    char buf[4];
+    snprintf(buf, sizeof(buf), "%d", battery);
+    lv_canvas_draw_text(canvas, x, 4, 34, &label, buf);
+}

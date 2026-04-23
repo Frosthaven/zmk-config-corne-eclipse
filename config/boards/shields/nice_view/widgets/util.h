@@ -34,6 +34,12 @@ struct status_state {
     bool caps_lock;
 #else
     bool connected;
+#if IS_ENABLED(CONFIG_ZMK_SPLIT_BLE_CENTRAL_BATTERY_MIRROR)
+    uint8_t central_battery;
+    bool central_charging;
+    bool central_battery_stale;
+    bool central_battery_received;
+#endif
 #endif
 };
 
@@ -44,6 +50,11 @@ struct battery_status_state {
 
 void rotate_canvas(lv_obj_t *canvas, lv_color_t cbuf[]);
 void draw_battery(lv_obj_t *canvas, const struct status_state *state);
+/* Render one 34x20 battery cell at (x, 0). Disconnected → centered X glyph;
+ * charging → inverted bar with centered bolt; stale → two 3x3 centered dots;
+ * else → numeric percent in Montserrat 12. */
+void draw_batt_cell(lv_obj_t *canvas, int x, bool charging, uint8_t battery,
+                    bool stale, bool connected, lv_draw_rect_dsc_t *rect_white);
 void init_label_dsc(lv_draw_label_dsc_t *label_dsc, lv_color_t color, const lv_font_t *font,
                     lv_text_align_t align);
 void init_rect_dsc(lv_draw_rect_dsc_t *rect_dsc, lv_color_t bg_color);
