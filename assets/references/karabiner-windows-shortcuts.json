@@ -332,7 +332,7 @@
             ]
         },
         {
-            "description": "Corne Eclipse Omni: Tap Left Command alone → launch Raycast (Control+Space)",
+            "description": "Corne Eclipse Omni: Tap Command alone → launch Raycast (Control+Space)",
             "manipulators": [
                 {
                     "type": "basic",

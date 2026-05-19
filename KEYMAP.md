@@ -127,17 +127,17 @@ Three rule groups — **Text Navigation**, **Text Editing**, and **App Shortcuts
 </details>
 
 <details>
-<summary>Tap Left Command alone → launch Raycast</summary>
+<summary>Tap Command alone → launch Raycast</summary>
 
 
-A modifier-tap rule turns the Left Command key into a [Raycast](https://www.raycast.com/) launcher when tapped on its own: hold Command and it behaves normally for shortcuts (e.g. `Cmd+S`), tap and release it alone and it fires `Control+Space` (Raycast's default global hotkey). Released using Karabiner's `to_if_alone` with `lazy: true`, so holding Command never registers as a key event until another key joins it — there's no menu flash or stray modifier press.
+A modifier-tap rule turns the Command key into a [Raycast](https://www.raycast.com/) launcher when tapped on its own: hold Command and it behaves normally for shortcuts (e.g. `Cmd+S`), tap and release it alone and it fires `Control+Space` (Raycast's default global hotkey). Released using Karabiner's `to_if_alone` with `lazy: true`, so holding Command never registers as a key event until another key joins it — there's no menu flash or stray modifier press.
 
 Bundled into the same `karabiner-windows-shortcuts.json` import URL as the omni-shortcuts above. The rule shows up in Karabiner as a separate enable/disable toggle, so you can leave it off if you'd rather not lose tap-Command.
 
 | Key | Action |
 |-----|--------|
-| Tap `Left Cmd` (no other key) | Launch / toggle Raycast |
-| Hold `Left Cmd` + any key | Normal Command behavior |
+| Tap `Cmd` (no other key) | Launch / toggle Raycast |
+| Hold `Cmd` + any key | Normal Command behavior |
 
 *Note: requires Raycast's global hotkey to be set to `Control+Space` (the default). If you've changed it, update the `to_if_alone` binding in the rule to match.*
 
