@@ -52,7 +52,8 @@ static void draw_top(lv_obj_t *widget, lv_color_t cbuf[], const struct status_st
      * central yet, or if the split link is currently down. */
     bool central_cell_connected = state->connected && state->central_battery_received;
     draw_batt_cell(canvas, 0, state->central_charging, state->central_battery,
-                   state->central_battery_stale, central_cell_connected,
+                   state->central_battery_stale || state->central_battery_boot_stale,
+                   central_cell_connected,
                    &rect_white_dsc);
 #else
     /* Without the mirror feature, the central cell can't show real data;
@@ -61,7 +62,8 @@ static void draw_top(lv_obj_t *widget, lv_color_t cbuf[], const struct status_st
 #endif
 
     /* Peripheral (own) cell. */
-    draw_batt_cell(canvas, 34, state->charging, state->battery, state->battery_stale,
+    draw_batt_cell(canvas, 34, state->charging, state->battery,
+                   state->battery_stale || state->battery_boot_stale,
                    true, &rect_white_dsc);
 
     rotate_canvas(canvas, cbuf);
@@ -171,6 +173,22 @@ ZMK_SUBSCRIPTION(widget_central_battery, zmk_central_battery_state_changed);
 
 #endif // CONFIG_ZMK_SPLIT_BLE_CENTRAL_BATTERY_MIRROR
 
+/* Cold-boot battery stale: hold ".." on the battery cells at widget
+ * init and clear it after the ZMK fork's relax-poll (5s post-boot)
+ * has had time to settle the loaded reading. Separate from the
+ * existing post-unplug stale flag so the two don't interfere. */
+static void clear_boot_stale_handler(struct k_work *work) {
+    struct zmk_widget_status *widget;
+    SYS_SLIST_FOR_EACH_CONTAINER(&widgets, widget, node) {
+        widget->state.battery_boot_stale = false;
+#if IS_ENABLED(CONFIG_ZMK_SPLIT_BLE_CENTRAL_BATTERY_MIRROR)
+        widget->state.central_battery_boot_stale = false;
+#endif
+        draw_top(widget->obj, widget->cbuf, &widget->state);
+    }
+}
+static K_WORK_DELAYABLE_DEFINE(clear_boot_stale_work, clear_boot_stale_handler);
+
 int zmk_widget_status_init(struct zmk_widget_status *widget, lv_obj_t *parent) {
     widget->obj = lv_obj_create(parent);
     lv_obj_set_size(widget->obj, 160, 68);
@@ -181,6 +199,14 @@ int zmk_widget_status_init(struct zmk_widget_status *widget, lv_obj_t *parent) {
     lv_obj_t *art = lv_img_create(widget->obj);
     lv_img_set_src(art, &logo);
     lv_obj_align(art, LV_ALIGN_TOP_LEFT, 0, 0);
+
+    /* Show ".." on the battery cells until the cold-boot relax-poll has
+     * had time to land on a loaded reading. See clear_boot_stale_handler. */
+    widget->state.battery_boot_stale = true;
+#if IS_ENABLED(CONFIG_ZMK_SPLIT_BLE_CENTRAL_BATTERY_MIRROR)
+    widget->state.central_battery_boot_stale = true;
+#endif
+    k_work_schedule(&clear_boot_stale_work, K_SECONDS(6));
 
     sys_slist_append(&widgets, &widget->node);
     widget_battery_status_init();

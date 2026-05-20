@@ -19,6 +19,11 @@ struct status_state {
     uint8_t battery;
     bool charging;
     bool battery_stale;
+    /* Cold-boot transient stale: held true at widget init and cleared
+     * by a one-shot delayed work after the ZMK relax-poll has had time
+     * to settle the displayed %. Separate flag so it doesn't tangle
+     * with the existing post-unplug battery_stale path. */
+    bool battery_boot_stale;
 #if !IS_ENABLED(CONFIG_ZMK_SPLIT) || IS_ENABLED(CONFIG_ZMK_SPLIT_ROLE_CENTRAL)
     struct zmk_endpoint_instance selected_endpoint;
     int active_profile_index;
@@ -32,6 +37,7 @@ struct status_state {
     bool peripheral_charging;
     bool peripheral_connected;
     bool peripheral_battery_stale;
+    bool peripheral_battery_boot_stale;
     bool caps_lock;
 #else
     bool connected;
@@ -39,6 +45,7 @@ struct status_state {
     uint8_t central_battery;
     bool central_charging;
     bool central_battery_stale;
+    bool central_battery_boot_stale;
     bool central_battery_received;
 #endif
 #endif
