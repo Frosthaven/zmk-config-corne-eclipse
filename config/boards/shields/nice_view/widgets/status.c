@@ -99,12 +99,15 @@ static void draw_top(lv_obj_t *widget, lv_color_t cbuf[], const struct status_st
     // still inflated until the cell voltage relaxes; show two small centered
     // dots in that window. Numeric percent uses Montserrat 12.
     draw_batt_cell(canvas, 0,
-                   state->charging, state->battery, state->battery_stale, true,
+                   state->charging, state->battery,
+                   state->battery_stale || state->battery_boot_stale, true,
                    &rect_white_dsc);
 
     draw_batt_cell(canvas, 34,
                    state->peripheral_charging, state->peripheral_battery,
-                   state->peripheral_battery_stale, state->peripheral_connected,
+                   state->peripheral_battery_stale ||
+                       state->peripheral_battery_boot_stale,
+                   state->peripheral_connected,
                    &rect_white_dsc);
 
     // Rotate canvas
@@ -474,6 +477,23 @@ ZMK_DISPLAY_WIDGET_LISTENER(widget_indicator_status, struct indicator_status_sta
 ZMK_SUBSCRIPTION(widget_indicator_status, zmk_hid_indicators_changed);
 #endif /* CONFIG_ZMK_HID_INDICATORS */
 
+/* Cold-boot battery stale: hold ".." on the battery row at widget init
+ * and clear it a few seconds later. The ZMK fork schedules a relax-poll
+ * 5s after zmk_battery_init so the displayed % has time to settle off
+ * the cell's open-circuit (inflated) reading; this delay is set 1s
+ * past that so the relax poll has been processed before we drop the
+ * stale flag and redraw. Independent of the post-unplug battery_stale
+ * path so the two don't interfere. */
+static void clear_boot_stale_handler(struct k_work *work) {
+    struct zmk_widget_status *widget;
+    SYS_SLIST_FOR_EACH_CONTAINER(&widgets, widget, node) {
+        widget->state.battery_boot_stale = false;
+        widget->state.peripheral_battery_boot_stale = false;
+        draw_top(widget->obj, widget->cbuf, &widget->state);
+    }
+}
+static K_WORK_DELAYABLE_DEFINE(clear_boot_stale_work, clear_boot_stale_handler);
+
 int zmk_widget_status_init(struct zmk_widget_status *widget, lv_obj_t *parent) {
     widget->obj = lv_obj_create(parent);
     lv_obj_set_size(widget->obj, 160, 68);
@@ -489,6 +509,12 @@ int zmk_widget_status_init(struct zmk_widget_status *widget, lv_obj_t *parent) {
     lv_obj_t *bottom = lv_canvas_create(widget->obj);
     lv_obj_align(bottom, LV_ALIGN_TOP_LEFT, 0, 0);
     lv_canvas_set_buffer(bottom, widget->cbuf3, CANVAS_SIZE, CANVAS_SIZE, LV_IMG_CF_TRUE_COLOR);
+
+    /* Show ".." on the battery cells until the cold-boot relax-poll has
+     * had time to land on a loaded reading. See clear_boot_stale_handler. */
+    widget->state.battery_boot_stale = true;
+    widget->state.peripheral_battery_boot_stale = true;
+    k_work_schedule(&clear_boot_stale_work, K_SECONDS(6));
 
     sys_slist_append(&widgets, &widget->node);
     widget_battery_status_init();
