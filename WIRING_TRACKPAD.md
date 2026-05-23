@@ -41,7 +41,7 @@ Cirque modules ship in a few form factors, most commonly a flat self-adhesive fl
 | SDA | I2C data | P0.17 (pro_micro SDA / pad 2) | Reuses the display's SDA pad |
 | SCL | I2C clock | P0.20 (pro_micro SCL / pad 3) | Reuses the display's SCL pad |
 | RDY (Azoteq) / DR (Cirque) | **SPI_SCK net (pad 14)** | P0.10 (pro_micro D16) | Active high. Hand-wire to the pad labeled **SPI_SCK** on the PCB (silkscreen pad 14). |
-| VCC / VDD | 3.3 V | 3.3 V rail | From the nice!nano 3.3 V rail. Cirque ASIC is 3.3 V only; do not wire to 5 V. |
+| VCC / VDD / 3V3 | 3.3 V | 3.3 V rail | From the nice!nano 3.3 V rail. Labeled `3V3` on Azoteq, `VDD` on Cirque. Cirque ASIC is 3.3 V only; do not wire to 5 V. |
 | GND | Ground | GND | Any ground pad |
 
 The signal names differ slightly between modules (RDY on Azoteq, DR on Cirque) but go to the same nice!nano pin and serve the same purpose: a data-ready interrupt from the trackpad.
