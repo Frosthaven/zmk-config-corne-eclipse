@@ -6,6 +6,44 @@
 
 #include "corne_eclipse.dtsi"
 
+#if defined(TRACKPAD_PERIPHERAL) || defined(TRACKPAD_CENTRAL)
+#include <dt-bindings/zmk/keys.h>
+#include <dt-bindings/zmk/pointing.h>
+#include <zephyr/dt-bindings/input/input-event-codes.h>
+
+/* Map the trackpad's two-finger zoom to Ctrl+scroll (the de-facto zoom in
+ * browsers/maps/image viewers). The forked Azoteq driver emits the zoom as KEY
+ * clicks -- spread on INPUT_BTN_4, pinch on INPUT_BTN_5 -- because the behaviors
+ * input processor is built for key events, not relative ones. Attached to
+ * whichever listener consumes the trackpad on this (central) half below. */
+/ {
+    macros {
+        tp_zoom_in: tp_zoom_in {
+            compatible = "zmk,behavior-macro";
+            #binding-cells = <0>;
+            bindings = <&macro_press &kp LCTRL>
+                     , <&macro_tap &msc SCRL_UP>
+                     , <&macro_release &kp LCTRL>;
+        };
+        tp_zoom_out: tp_zoom_out {
+            compatible = "zmk,behavior-macro";
+            #binding-cells = <0>;
+            bindings = <&macro_press &kp LCTRL>
+                     , <&macro_tap &msc SCRL_DOWN>
+                     , <&macro_release &kp LCTRL>;
+        };
+    };
+
+    tp_zoom_proc: tp_zoom_proc {
+        compatible = "zmk,input-processor-behaviors";
+        #input-processor-cells = <0>;
+        type = <INPUT_EV_KEY>;
+        codes = <INPUT_BTN_4 INPUT_BTN_5>; /* zoom in (spread), zoom out (pinch) */
+        bindings = <&tp_zoom_in &tp_zoom_out>;
+    };
+};
+#endif
+
 &kscan0 {
     col-gpios
         = <&pro_micro 21 GPIO_ACTIVE_HIGH>
@@ -21,20 +59,38 @@
     status = "okay";
 };
 
-#ifdef USE_TRACKPAD
+#ifdef TRACKPAD_PERIPHERAL
 
-/* Display is electrically incompatible with a trackpad: nice!view's SPI0
- * uses the same P0.17/P0.20 pins that the trackpad needs for I2C. */
+/* The trackpad is on the peripheral (right) half; this central receives the
+ * forwarded input and runs the listeners. The input-split proxy nodes and
+ * their (disabled) listeners are defined in the shared .dtsi; enable them
+ * here. The display stays on -- only the half with the physical trackpad
+ * loses its display. */
+&azoteq_listener {
+    status = "okay";
+    input-processors = <&tp_zoom_proc>;
+};
+
+&cirque_listener {
+    status = "okay";
+    /* If X/Y feel inverted after flashing, add e.g.:
+     * input-processors = <&zip_xy_transform (INPUT_TRANSFORM_X_INVERT)>;
+     */
+};
+
+#endif /* TRACKPAD_PERIPHERAL */
+
+#ifdef TRACKPAD_CENTRAL
+
+/* This (central) half physically hosts the trackpad. Display disabled for
+ * the same I2C/SPI pin conflict as the peripheral case. A central-local
+ * pointing device uses a DIRECT input-listener: it is already on the HID
+ * host half, so no split forwarding is needed. The central also publishes
+ * its status to the peripheral display (see corne_eclipse_left.conf). */
 &oled {
     status = "disabled";
 };
 
-/* Both trackpad device tree nodes are defined unconditionally so a single
- * firmware can detect whichever physical trackpad is wired. The driver
- * whose I2C device doesn't respond fails to probe and stays silent; the
- * one that does respond becomes active. Both expect their RDY/DR signal
- * on pad 14 (SPI_SCK net = D16 = P0.10), so hand-wiring connects the
- * trackpad's interrupt line to that pad. */
 &pro_micro_i2c {
     azoteq_tp: iqs5xx@74 {
         compatible = "azoteq,iqs5xx";
@@ -42,8 +98,12 @@
         rdy-gpios = <&pro_micro 16 GPIO_ACTIVE_HIGH>;
         one-finger-tap;
         two-finger-tap;
+        three-finger-tap;
         press-and-hold;
+        drag-lock;
         scroll;
+        /* zoom; -- disabled: the 43mm pad is too small for the chip to detect a
+         * pinch reliably, and at sensitive thresholds it steals scroll. */
         flip-x;
     };
 
@@ -56,18 +116,16 @@
 };
 
 / {
-    azoteq_listener: azoteq_listener {
+    azoteq_local_listener: azoteq_local_listener {
         compatible = "zmk,input-listener";
         device = <&azoteq_tp>;
+        input-processors = <&tp_zoom_proc>;
     };
 
-    cirque_listener: cirque_listener {
+    cirque_local_listener: cirque_local_listener {
         compatible = "zmk,input-listener";
         device = <&cirque_tp>;
-        /* Tune orientation after first flash if X/Y feel inverted:
-         * input-processors = <&zip_xy_transform (INPUT_TRANSFORM_X_INVERT)>;
-         */
     };
 };
 
-#endif
+#endif /* TRACKPAD_CENTRAL */

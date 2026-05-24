@@ -64,19 +64,42 @@ The signal names differ slightly between modules (RDY on Azoteq, DR on Cirque) b
 
 ## Firmware
 
-Flash the trackpad variant for the half where the trackpad is installed. The opposite half can use either the default or trackpad variant independently (each half is flashed separately):
+**A trackpad is flashed as a coordinated pair, not one half at a time.** The left half is the split central (the half that talks to your computer); the right half is the peripheral. A trackpad on the peripheral can't reach the computer on its own - it forwards its input to the central over the split link - so the central's firmware has to be built to receive it. Flashing only the trackpad half will result in no cursor movement.
 
-- Left half with trackpad: `left_trackpad_corne_eclipse_<layout>.zmk.uf2`
-- Right half with trackpad: `right_trackpad_corne_eclipse_<layout>.zmk.uf2`
+Each release zip is organized into scenario folders. Pick the one that matches where your trackpad is, and flash **both** `.uf2` files in that folder (left to the left half, right to the right half):
 
-Both variants bundle the Azoteq IQS5xx and Cirque Pinnacle drivers, so a single firmware works for either module type. See [FLASHING.md](FLASHING.md) for flashing instructions.
+| Your build | Folder | Flash to left | Flash to right |
+|---|---|---|---|
+| No trackpad | `no trackpads/` | `standard_left_…` | `standard_right_…` |
+| Trackpad on the **right** (peripheral) | `trackpad on peripheral side/` | `trackpad_peripheral_left_…` | `trackpad_peripheral_right_…` |
+| Trackpad on the **left** (central) | `trackpad on central side/` | `trackpad_central_left_…` | `trackpad_central_right_…` |
+
+The half that physically has the trackpad can't drive a nice!view display (the trackpad reuses the display's I2C pins). If the other half has a display fitted, the status widgets render there. Each trackpad firmware bundles both the Azoteq IQS5xx and Cirque Pinnacle drivers, so one build works for either module. See [FLASHING.md](FLASHING.md) for flashing instructions.
+
+> If you flash mismatched halves (e.g. a `trackpad_peripheral_right` with a `standard_left`), the trackpad will not work - the central won't be listening for the forwarded input. Always flash both halves from the same folder.
 
 ## Trackpad Features
 
-With the default firmware configuration, both trackpads support:
+Both trackpads support:
 
 - Single-finger cursor movement
 - Single-finger tap for left click
-- Two-finger tap for right click
-- Press and hold for drag
 - Two-finger vertical and horizontal scroll
+
+The **Azoteq TPS43** has a multi-touch gesture engine and additionally supports:
+
+- Two-finger tap for right click
+- Three-finger tap for middle click
+- **Press-and-hold drag-lock** (press and hold to grab, then drag; it holds
+  across finger lifts and is released by a tap). Starting the drag from a
+  press-and-hold rather than a tap means it can grab a multi-file selection
+  without the tap deselecting it.
+
+> **Pinch / expand zoom is not enabled.** It is implemented (the chip's zoom
+> gesture, mapped to Ctrl+scroll on the host), but the 43 mm pad is too small for
+> the chip to detect a pinch reliably — the two contacts barely change
+> separation, so zoom rarely triggers, and at sensitive thresholds it steals
+> two-finger scroll. So it's left disabled (no other firmware — QMK, the rwalkr
+> Rust crate, the Linux driver — ships it either). Use Ctrl + scroll for zoom.
+
+The **Cirque Pinnacle** (GlidePoint Circle) is **single-touch hardware** — it can only track one finger at a time. It therefore cannot do any two-finger or three-finger gesture, and double-tap-drag is not implemented for it; it provides cursor movement, tap-to-click, and scroll. This is a hardware limitation of the Pinnacle, not a firmware choice.
