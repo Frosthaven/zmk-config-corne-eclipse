@@ -48,6 +48,18 @@ struct status_state {
     bool central_battery_boot_stale;
     bool central_battery_received;
 #endif
+#if IS_ENABLED(CONFIG_ZMK_SPLIT_CENTRAL_STATUS_MIRROR)
+    /* Central's keymap status, forwarded over the split link so this
+     * peripheral can render it when the central has no display of its own
+     * (central-mounted trackpad). */
+    uint8_t central_layer;
+    uint8_t central_profile;
+    uint8_t central_wpm;
+    bool central_caps_lock;
+    bool central_active_connected;
+    bool central_endpoint_usb;
+    bool central_status_received;
+#endif
 #endif
 };
 

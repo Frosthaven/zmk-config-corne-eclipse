@@ -40,11 +40,11 @@ include:
   - board: nice_nano_v2
     shield: corne_eclipse_left
     snippet: studio-rpc-usb-uart
-    cmake-args: -DCONFIG_ZMK_STUDIO=y -DCONFIG_INPUT_AZOTEQ_IQS5XX=y -DCONFIG_INPUT_PINNACLE=y -DCONFIG_I2C=y -DCONFIG_ZMK_DISPLAY=n -DDTS_EXTRA_CPPFLAGS="-DTRACKPAD_CENTRAL=1"
+    cmake-args: -DCONFIG_ZMK_STUDIO=y -DCONFIG_INPUT_AZOTEQ_IQS5XX=y -DCONFIG_INPUT_PINNACLE=y -DCONFIG_I2C=y -DCONFIG_ZMK_DISPLAY=n -DCONFIG_ZMK_SPLIT_CENTRAL_STATUS_MIRROR=y -DDTS_EXTRA_CPPFLAGS="-DTRACKPAD_CENTRAL=1"
     artifact-name: trackpad_central_left_corne_eclipse_colemak_dh.zmk
   - board: nice_nano_v2
     shield: corne_eclipse_right eclipse_nice_view_adapter_trrs nice_view
-    cmake-args: -DDTS_EXTRA_CPPFLAGS="-DTRACKPAD_CENTRAL=1"
+    cmake-args: -DCONFIG_ZMK_SPLIT_CENTRAL_STATUS_MIRROR=y -DDTS_EXTRA_CPPFLAGS="-DTRACKPAD_CENTRAL=1"
     artifact-name: trackpad_central_right_corne_eclipse_colemak_dh.zmk
 
   # ===================== QWERTY =====================
@@ -69,11 +69,11 @@ include:
   - board: nice_nano_v2
     shield: corne_eclipse_left
     snippet: studio-rpc-usb-uart
-    cmake-args: -DCONFIG_ZMK_STUDIO=y -DCONFIG_INPUT_AZOTEQ_IQS5XX=y -DCONFIG_INPUT_PINNACLE=y -DCONFIG_I2C=y -DCONFIG_ZMK_DISPLAY=n "-DDTS_EXTRA_CPPFLAGS=-DDEFAULT_TYPING_LAYER=1;-DTRACKPAD_CENTRAL=1"
+    cmake-args: -DCONFIG_ZMK_STUDIO=y -DCONFIG_INPUT_AZOTEQ_IQS5XX=y -DCONFIG_INPUT_PINNACLE=y -DCONFIG_I2C=y -DCONFIG_ZMK_DISPLAY=n -DCONFIG_ZMK_SPLIT_CENTRAL_STATUS_MIRROR=y "-DDTS_EXTRA_CPPFLAGS=-DDEFAULT_TYPING_LAYER=1;-DTRACKPAD_CENTRAL=1"
     artifact-name: trackpad_central_left_corne_eclipse_qwerty.zmk
   - board: nice_nano_v2
     shield: corne_eclipse_right eclipse_nice_view_adapter_trrs nice_view
-    cmake-args: -DDTS_EXTRA_CPPFLAGS="-DDEFAULT_TYPING_LAYER=1;-DTRACKPAD_CENTRAL=1"
+    cmake-args: -DCONFIG_ZMK_SPLIT_CENTRAL_STATUS_MIRROR=y -DDTS_EXTRA_CPPFLAGS="-DDEFAULT_TYPING_LAYER=1;-DTRACKPAD_CENTRAL=1"
     artifact-name: trackpad_central_right_corne_eclipse_qwerty.zmk
 
   # ===================== Dvorak =====================
@@ -98,11 +98,11 @@ include:
   - board: nice_nano_v2
     shield: corne_eclipse_left
     snippet: studio-rpc-usb-uart
-    cmake-args: -DCONFIG_ZMK_STUDIO=y -DCONFIG_INPUT_AZOTEQ_IQS5XX=y -DCONFIG_INPUT_PINNACLE=y -DCONFIG_I2C=y -DCONFIG_ZMK_DISPLAY=n "-DDTS_EXTRA_CPPFLAGS=-DDEFAULT_TYPING_LAYER=2;-DTRACKPAD_CENTRAL=1"
+    cmake-args: -DCONFIG_ZMK_STUDIO=y -DCONFIG_INPUT_AZOTEQ_IQS5XX=y -DCONFIG_INPUT_PINNACLE=y -DCONFIG_I2C=y -DCONFIG_ZMK_DISPLAY=n -DCONFIG_ZMK_SPLIT_CENTRAL_STATUS_MIRROR=y "-DDTS_EXTRA_CPPFLAGS=-DDEFAULT_TYPING_LAYER=2;-DTRACKPAD_CENTRAL=1"
     artifact-name: trackpad_central_left_corne_eclipse_dvorak.zmk
   - board: nice_nano_v2
     shield: corne_eclipse_right eclipse_nice_view_adapter_trrs nice_view
-    cmake-args: -DDTS_EXTRA_CPPFLAGS="-DDEFAULT_TYPING_LAYER=2;-DTRACKPAD_CENTRAL=1"
+    cmake-args: -DCONFIG_ZMK_SPLIT_CENTRAL_STATUS_MIRROR=y -DDTS_EXTRA_CPPFLAGS="-DDEFAULT_TYPING_LAYER=2;-DTRACKPAD_CENTRAL=1"
     artifact-name: trackpad_central_right_corne_eclipse_dvorak.zmk
 
   # ===================== Workman =====================
@@ -127,11 +127,11 @@ include:
   - board: nice_nano_v2
     shield: corne_eclipse_left
     snippet: studio-rpc-usb-uart
-    cmake-args: -DCONFIG_ZMK_STUDIO=y -DCONFIG_INPUT_AZOTEQ_IQS5XX=y -DCONFIG_INPUT_PINNACLE=y -DCONFIG_I2C=y -DCONFIG_ZMK_DISPLAY=n "-DDTS_EXTRA_CPPFLAGS=-DDEFAULT_TYPING_LAYER=3;-DTRACKPAD_CENTRAL=1"
+    cmake-args: -DCONFIG_ZMK_STUDIO=y -DCONFIG_INPUT_AZOTEQ_IQS5XX=y -DCONFIG_INPUT_PINNACLE=y -DCONFIG_I2C=y -DCONFIG_ZMK_DISPLAY=n -DCONFIG_ZMK_SPLIT_CENTRAL_STATUS_MIRROR=y "-DDTS_EXTRA_CPPFLAGS=-DDEFAULT_TYPING_LAYER=3;-DTRACKPAD_CENTRAL=1"
     artifact-name: trackpad_central_left_corne_eclipse_workman.zmk
   - board: nice_nano_v2
     shield: corne_eclipse_right eclipse_nice_view_adapter_trrs nice_view
-    cmake-args: -DDTS_EXTRA_CPPFLAGS="-DDEFAULT_TYPING_LAYER=3;-DTRACKPAD_CENTRAL=1"
+    cmake-args: -DCONFIG_ZMK_SPLIT_CENTRAL_STATUS_MIRROR=y -DDTS_EXTRA_CPPFLAGS="-DDEFAULT_TYPING_LAYER=3;-DTRACKPAD_CENTRAL=1"
     artifact-name: trackpad_central_right_corne_eclipse_workman.zmk
 
   # ===================== Colemak =====================
@@ -156,11 +156,11 @@ include:
   - board: nice_nano_v2
     shield: corne_eclipse_left
     snippet: studio-rpc-usb-uart
-    cmake-args: -DCONFIG_ZMK_STUDIO=y -DCONFIG_INPUT_AZOTEQ_IQS5XX=y -DCONFIG_INPUT_PINNACLE=y -DCONFIG_I2C=y -DCONFIG_ZMK_DISPLAY=n "-DDTS_EXTRA_CPPFLAGS=-DDEFAULT_TYPING_LAYER=4;-DTRACKPAD_CENTRAL=1"
+    cmake-args: -DCONFIG_ZMK_STUDIO=y -DCONFIG_INPUT_AZOTEQ_IQS5XX=y -DCONFIG_INPUT_PINNACLE=y -DCONFIG_I2C=y -DCONFIG_ZMK_DISPLAY=n -DCONFIG_ZMK_SPLIT_CENTRAL_STATUS_MIRROR=y "-DDTS_EXTRA_CPPFLAGS=-DDEFAULT_TYPING_LAYER=4;-DTRACKPAD_CENTRAL=1"
     artifact-name: trackpad_central_left_corne_eclipse_colemak.zmk
   - board: nice_nano_v2
     shield: corne_eclipse_right eclipse_nice_view_adapter_trrs nice_view
-    cmake-args: -DDTS_EXTRA_CPPFLAGS="-DDEFAULT_TYPING_LAYER=4;-DTRACKPAD_CENTRAL=1"
+    cmake-args: -DCONFIG_ZMK_SPLIT_CENTRAL_STATUS_MIRROR=y -DDTS_EXTRA_CPPFLAGS="-DDEFAULT_TYPING_LAYER=4;-DTRACKPAD_CENTRAL=1"
     artifact-name: trackpad_central_right_corne_eclipse_colemak.zmk
 
   # ===================== rgb_while_building (dev tool) =====================
