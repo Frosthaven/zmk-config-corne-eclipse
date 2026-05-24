@@ -11,10 +11,11 @@
 #include <dt-bindings/zmk/pointing.h>
 #include <zephyr/dt-bindings/input/input-event-codes.h>
 
-/* Map the trackpad's two-finger zoom (from the forked Azoteq driver, which
- * emits expand on INPUT_REL_MISC and pinch on INPUT_REL_DIAL) to Ctrl+scroll,
- * the de-facto zoom on browsers/maps/image viewers. Attached to whichever
- * listener consumes the trackpad on this (central) half below. */
+/* Map the trackpad's two-finger zoom to Ctrl+scroll (the de-facto zoom in
+ * browsers/maps/image viewers). The forked Azoteq driver emits the zoom as KEY
+ * clicks -- spread on INPUT_BTN_4, pinch on INPUT_BTN_5 -- because the behaviors
+ * input processor is built for key events, not relative ones. Attached to
+ * whichever listener consumes the trackpad on this (central) half below. */
 / {
     macros {
         tp_zoom_in: tp_zoom_in {
@@ -36,8 +37,8 @@
     tp_zoom_proc: tp_zoom_proc {
         compatible = "zmk,input-processor-behaviors";
         #input-processor-cells = <0>;
-        type = <INPUT_EV_REL>;
-        codes = <INPUT_REL_MISC INPUT_REL_DIAL>; /* expand, pinch */
+        type = <INPUT_EV_KEY>;
+        codes = <INPUT_BTN_4 INPUT_BTN_5>; /* zoom in (spread), zoom out (pinch) */
         bindings = <&tp_zoom_in &tp_zoom_out>;
     };
 };
