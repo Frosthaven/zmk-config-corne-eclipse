@@ -60,7 +60,8 @@
         press-and-hold;
         drag-lock;
         scroll;
-        zoom;
+        /* zoom; -- disabled: the 43mm pad is too small for the chip to detect a
+         * pinch reliably, and at sensitive thresholds it steals scroll. */
         flip-x;
     };
 

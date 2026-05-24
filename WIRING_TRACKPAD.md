@@ -95,10 +95,11 @@ The **Azoteq TPS43** has a multi-touch gesture engine and additionally supports:
   press-and-hold rather than a tap means it can grab a multi-file selection
   without the tap deselecting it.
 
-> **Pinch / expand zoom is experimental.** It is implemented (the chip's zoom
-> gesture, mapped to Ctrl+scroll on the host), but the IQS5xx's zoom competes
-> with two-finger scroll and is finicky to trigger — it may need tuning and may
-> not fire reliably on every unit. No other firmware (QMK, the rwalkr Rust crate,
-> the Linux driver) exercises it either.
+> **Pinch / expand zoom is not enabled.** It is implemented (the chip's zoom
+> gesture, mapped to Ctrl+scroll on the host), but the 43 mm pad is too small for
+> the chip to detect a pinch reliably — the two contacts barely change
+> separation, so zoom rarely triggers, and at sensitive thresholds it steals
+> two-finger scroll. So it's left disabled (no other firmware — QMK, the rwalkr
+> Rust crate, the Linux driver — ships it either). Use Ctrl + scroll for zoom.
 
 The **Cirque Pinnacle** (GlidePoint Circle) is **single-touch hardware** — it can only track one finger at a time. It therefore cannot do any two-finger or three-finger gesture, and double-tap-drag is not implemented for it; it provides cursor movement, tap-to-click, and scroll. This is a hardware limitation of the Pinnacle, not a firmware choice.
