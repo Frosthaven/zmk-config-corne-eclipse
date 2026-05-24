@@ -24,7 +24,7 @@ manifest:
       # modules keyed on west.yml's hash and runs `west update --fetch smart`, so
       # pushing new branch commits without changing this file would silently
       # reuse a stale cached checkout. Bump this SHA on every driver change.
-      revision: fa0c3f48d5787dd4541a386a5930357e37bbda11
+      revision: 3a49e006d8723a965c2cfe50ecc5690d0866d399
     - name: cirque-input-module
       remote: petejohanson
       revision: main

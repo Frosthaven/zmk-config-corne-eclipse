@@ -100,7 +100,7 @@
         two-finger-tap;
         three-finger-tap;
         press-and-hold;
-        drag-requires-double-tap;
+        drag-lock;
         scroll;
         zoom;
         flip-x;
