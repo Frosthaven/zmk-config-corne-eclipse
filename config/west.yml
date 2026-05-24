@@ -20,7 +20,11 @@ manifest:
       revision: main
     - name: zmk-driver-azoteq-iqs5xx
       remote: frosthaven
-      revision: gestures
+      # Pinned to an exact commit (not the 'gestures' branch): the CI caches west
+      # modules keyed on west.yml's hash and runs `west update --fetch smart`, so
+      # pushing new branch commits without changing this file would silently
+      # reuse a stale cached checkout. Bump this SHA on every driver change.
+      revision: 2e917e663b3725a4d72327d67dd6b4f29f1cc057
     - name: cirque-input-module
       remote: petejohanson
       revision: main
