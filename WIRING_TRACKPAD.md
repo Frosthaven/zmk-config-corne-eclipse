@@ -80,10 +80,16 @@ The half that physically has the trackpad can't drive a nice!view display (the t
 
 ## Trackpad Features
 
-With the default firmware configuration, both trackpads support:
+Both trackpads support:
 
 - Single-finger cursor movement
 - Single-finger tap for left click
-- Two-finger tap for right click
-- Press and hold for drag
 - Two-finger vertical and horizontal scroll
+
+The **Azoteq TPS43** has a multi-touch gesture engine and additionally supports:
+
+- Two-finger tap for right click
+- Two-finger **pinch / expand zoom** (mapped to Ctrl+scroll on the host)
+- **Double-tap-and-drag** (tap, then press-and-drag to select/move) for click-and-drag
+
+The **Cirque Pinnacle** (GlidePoint Circle) is **single-touch hardware** — it can only track one finger at a time. It therefore does **not** support two-finger pinch/expand zoom, and double-tap-drag is not implemented for it; it provides cursor movement, tap-to-click, and scroll. This is a hardware limitation of the Pinnacle, not a firmware choice.
