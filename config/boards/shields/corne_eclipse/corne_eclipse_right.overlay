@@ -35,20 +35,20 @@
     status = "okay";
 };
 
-#ifdef USE_TRACKPAD
+#ifdef TRACKPAD_PERIPHERAL
 
-/* Display is electrically incompatible with a trackpad: nice!view's SPI0
- * uses the same P0.17/P0.20 pins that the trackpad needs for I2C. */
+/* This (peripheral) half physically hosts the trackpad. The nice!view
+ * display is electrically incompatible with it: nice!view's SPI0 uses the
+ * same P0.17/P0.20 pins the trackpad needs for I2C, so the display is
+ * disabled here. */
 &oled {
     status = "disabled";
 };
 
-/* Both trackpad device tree nodes are defined unconditionally so a single
- * firmware can detect whichever physical trackpad is wired. The driver
- * whose I2C device doesn't respond fails to probe and stays silent; the
- * one that does respond becomes active. Both expect their RDY/DR signal
- * on pad 14 (SPI_SCK net = D16 = P0.10), so hand-wiring connects the
- * trackpad's interrupt line to that pad. */
+/* Both trackpad device nodes are defined so one firmware auto-detects
+ * whichever module is wired: the I2C device that doesn't respond fails to
+ * probe and stays silent. Both expect their RDY/DR signal on pad 14
+ * (SPI_SCK net = D16 = P0.10). */
 &pro_micro_i2c {
     azoteq_tp: iqs5xx@74 {
         compatible = "azoteq,iqs5xx";
@@ -69,19 +69,17 @@
     };
 };
 
-/ {
-    azoteq_listener: azoteq_listener {
-        compatible = "zmk,input-listener";
-        device = <&azoteq_tp>;
-    };
-
-    cirque_listener: cirque_listener {
-        compatible = "zmk,input-listener";
-        device = <&cirque_tp>;
-        /* Tune orientation after first flash if X/Y feel inverted:
-         * input-processors = <&zip_xy_transform (INPUT_TRANSFORM_X_INVERT)>;
-         */
-    };
+/* Forward the local trackpad to the central over the split link. The
+ * input-split proxy nodes and their (disabled) listeners live in the shared
+ * .dtsi; here we attach each physical device to its proxy. The central
+ * enables the matching listener. A plain input-listener on the peripheral
+ * would NOT reach the host -- peripheral pointing requires input-split. */
+&azoteq_split {
+    device = <&azoteq_tp>;
 };
 
-#endif
+&cirque_split {
+    device = <&cirque_tp>;
+};
+
+#endif /* TRACKPAD_PERIPHERAL */

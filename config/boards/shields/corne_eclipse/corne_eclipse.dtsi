@@ -208,3 +208,40 @@ RC(2,1) RC(2,2) RC(2,3) RC(2,4) RC(2,5)  RC(2,6) RC(2,7) RC(2,8) RC(2,9) RC(2,10
         prechargep = <0x22>;
     };
 };
+
+/* Split input forwarding for a peripheral-side trackpad. Defined on both
+ * halves of the peripheral-trackpad scenario so the input-split channel reg
+ * indices line up. The peripheral attaches each physical device to its proxy
+ * (corne_eclipse_right.overlay); the central enables the matching listener
+ * (corne_eclipse_left.overlay). The listeners start disabled so a peripheral
+ * build (which can't compile the central-only input-listener) stays clean. */
+#ifdef TRACKPAD_PERIPHERAL
+/ {
+    split_inputs {
+        #address-cells = <1>;
+        #size-cells = <0>;
+
+        azoteq_split: azoteq_split@0 {
+            compatible = "zmk,input-split";
+            reg = <0>;
+        };
+
+        cirque_split: cirque_split@1 {
+            compatible = "zmk,input-split";
+            reg = <1>;
+        };
+    };
+
+    azoteq_listener: azoteq_listener {
+        compatible = "zmk,input-listener";
+        device = <&azoteq_split>;
+        status = "disabled";
+    };
+
+    cirque_listener: cirque_listener {
+        compatible = "zmk,input-listener";
+        device = <&cirque_split>;
+        status = "disabled";
+    };
+};
+#endif /* TRACKPAD_PERIPHERAL */

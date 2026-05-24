@@ -21,20 +21,37 @@
     status = "okay";
 };
 
-#ifdef USE_TRACKPAD
+#ifdef TRACKPAD_PERIPHERAL
 
-/* Display is electrically incompatible with a trackpad: nice!view's SPI0
- * uses the same P0.17/P0.20 pins that the trackpad needs for I2C. */
+/* The trackpad is on the peripheral (right) half; this central receives the
+ * forwarded input and runs the listeners. The input-split proxy nodes and
+ * their (disabled) listeners are defined in the shared .dtsi; enable them
+ * here. The display stays on -- only the half with the physical trackpad
+ * loses its display. */
+&azoteq_listener {
+    status = "okay";
+};
+
+&cirque_listener {
+    status = "okay";
+    /* If X/Y feel inverted after flashing, add e.g.:
+     * input-processors = <&zip_xy_transform (INPUT_TRANSFORM_X_INVERT)>;
+     */
+};
+
+#endif /* TRACKPAD_PERIPHERAL */
+
+#ifdef TRACKPAD_CENTRAL
+
+/* This (central) half physically hosts the trackpad. Display disabled for
+ * the same I2C/SPI pin conflict as the peripheral case. A central-local
+ * pointing device uses a DIRECT input-listener: it is already on the HID
+ * host half, so no split forwarding is needed. The central also publishes
+ * its status to the peripheral display (see corne_eclipse_left.conf). */
 &oled {
     status = "disabled";
 };
 
-/* Both trackpad device tree nodes are defined unconditionally so a single
- * firmware can detect whichever physical trackpad is wired. The driver
- * whose I2C device doesn't respond fails to probe and stays silent; the
- * one that does respond becomes active. Both expect their RDY/DR signal
- * on pad 14 (SPI_SCK net = D16 = P0.10), so hand-wiring connects the
- * trackpad's interrupt line to that pad. */
 &pro_micro_i2c {
     azoteq_tp: iqs5xx@74 {
         compatible = "azoteq,iqs5xx";
@@ -56,18 +73,15 @@
 };
 
 / {
-    azoteq_listener: azoteq_listener {
+    azoteq_local_listener: azoteq_local_listener {
         compatible = "zmk,input-listener";
         device = <&azoteq_tp>;
     };
 
-    cirque_listener: cirque_listener {
+    cirque_local_listener: cirque_local_listener {
         compatible = "zmk,input-listener";
         device = <&cirque_tp>;
-        /* Tune orientation after first flash if X/Y feel inverted:
-         * input-processors = <&zip_xy_transform (INPUT_TRANSFORM_X_INVERT)>;
-         */
     };
 };
 
-#endif
+#endif /* TRACKPAD_CENTRAL */

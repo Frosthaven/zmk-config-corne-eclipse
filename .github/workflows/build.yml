@@ -29,24 +29,47 @@ jobs:
         run: |
           mkdir -p release
 
-          # Group .uf2 files by layout. Each layout ends up with both default
-          # and trackpad variants for each half plus settings_reset. Naming:
-          #   left_corne_eclipse_<layout>.zmk.uf2          (default left)
-          #   left_trackpad_corne_eclipse_<layout>.zmk.uf2 (left + trackpad)
-          #   right_corne_eclipse_<layout>.zmk.uf2          (default right)
-          #   right_trackpad_corne_eclipse_<layout>.zmk.uf2 (right + trackpad)
+          # Sort .uf2 files into per-layout staging dirs, grouped by trackpad
+          # scenario. The trackpad scenario decides which half pair you flash:
+          #   no trackpads/             standard_{left,right}
+          #   trackpad on peripheral/   trackpad_peripheral_{left,right}
+          #   trackpad on central/      trackpad_central_{left,right}
+          # A trackpad on the peripheral forwards input to the central over the
+          # split link, so BOTH halves in a folder must be flashed together.
           for file in artifacts/firmware/*.uf2; do
             [ -f "$file" ] || continue
-            basename=$(basename "$file")
-            layout=$(echo "$basename" | sed 's/^left_trackpad_corne_eclipse_//;s/^right_trackpad_corne_eclipse_//;s/^left_corne_eclipse_//;s/^right_corne_eclipse_//;s/\.zmk\.uf2$//')
-            mkdir -p "staging/$layout"
-            cp "$file" "staging/$layout/"
+            base=$(basename "$file")
+            case "$base" in
+              standard_left_corne_eclipse_*|standard_right_corne_eclipse_*)
+                scenario="no trackpads"
+                layout=$(echo "$base" | sed -E 's/^standard_(left|right)_corne_eclipse_//;s/\.zmk\.uf2$//')
+                ;;
+              trackpad_peripheral_left_corne_eclipse_*|trackpad_peripheral_right_corne_eclipse_*)
+                scenario="trackpad on peripheral side"
+                layout=$(echo "$base" | sed -E 's/^trackpad_peripheral_(left|right)_corne_eclipse_//;s/\.zmk\.uf2$//')
+                ;;
+              trackpad_central_left_corne_eclipse_*|trackpad_central_right_corne_eclipse_*)
+                scenario="trackpad on central side"
+                layout=$(echo "$base" | sed -E 's/^trackpad_central_(left|right)_corne_eclipse_//;s/\.zmk\.uf2$//')
+                ;;
+              left_corne_eclipse_rgb_while_building*|right_corne_eclipse_rgb_while_building*)
+                # dev tool: its own zip, no scenario folders
+                mkdir -p "staging/rgb_while_building"
+                cp "$file" "staging/rgb_while_building/"
+                continue
+                ;;
+              *)
+                echo "WARN: unrecognized artifact '$base' - skipping"
+                continue
+                ;;
+            esac
+            mkdir -p "staging/$layout/$scenario"
+            cp "$file" "staging/$layout/$scenario/"
           done
 
-          # Zip each layout (bundling settings_reset for clean-slate flashing).
-          # The rgb_while_building bundle uses a leading-underscore name so it
-          # sorts to the top of the release page and is visually separated
-          # from the daily-use layout zips.
+          # Zip each layout, preserving the scenario subfolders and dropping
+          # settings_reset at the zip root. The rgb_while_building bundle uses a
+          # leading-underscore name so it sorts to the top of the release page.
           if [ -d staging ]; then
             for layout_dir in staging/*/; do
               layout=$(basename "$layout_dir")
@@ -56,7 +79,7 @@ jobs:
               else
                 zip_name="corne_eclipse_${layout}.zip"
               fi
-              zip -j "release/${zip_name}" "$layout_dir"*
+              ( cd "$layout_dir" && zip -r "$GITHUB_WORKSPACE/release/${zip_name}" . )
             done
           fi
 
@@ -98,7 +121,13 @@ jobs:
 
             ---
 
-            Each zip contains left and right `.uf2` firmware files. Extract the zip and follow the [flashing guide](https://github.com/${{ github.repository }}/blob/main/FLASHING.md) to install.
+            Each zip is organized by trackpad scenario:
+
+            - **no trackpads/** - standard left + right (no pointing device)
+            - **trackpad on peripheral side/** - flash this pair if your trackpad is on the peripheral (right) half
+            - **trackpad on central side/** - flash this pair if your trackpad is on the central (left) half
+
+            Pick the folder for your build and flash **both** halves from it (a peripheral-side trackpad forwards input to the central, so the halves must match). `settings_reset-nice_nano_v2-zmk.uf2` is included for clean-slate flashing. Follow the [flashing guide](https://github.com/${{ github.repository }}/blob/main/FLASHING.md) and the [trackpad wiring guide](https://github.com/${{ github.repository }}/blob/main/WIRING_TRACKPAD.md).
 
             You can customize your keymap using [ZMK Studio](https://github.com/${{ github.repository }}/blob/main/KEYMAP.md#zmk-studio).
 
