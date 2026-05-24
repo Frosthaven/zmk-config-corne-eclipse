@@ -89,7 +89,14 @@ Both trackpads support:
 The **Azoteq TPS43** has a multi-touch gesture engine and additionally supports:
 
 - Two-finger tap for right click
-- Two-finger **pinch / expand zoom** (mapped to Ctrl+scroll on the host)
-- **Double-tap-and-drag** (tap, then press-and-drag to select/move) for click-and-drag
+- Three-finger tap for middle click
+- **Double-tap-and-drag lock** (tap, then touch-and-drag to select/move; it holds
+  across finger lifts and ends on a stationary tap)
 
-The **Cirque Pinnacle** (GlidePoint Circle) is **single-touch hardware** — it can only track one finger at a time. It therefore does **not** support two-finger pinch/expand zoom, and double-tap-drag is not implemented for it; it provides cursor movement, tap-to-click, and scroll. This is a hardware limitation of the Pinnacle, not a firmware choice.
+> **Pinch / expand zoom is not supported.** It is implemented in the driver but
+> the IQS5xx does not raise its zoom gesture in practice (no known firmware —
+> QMK, the rwalkr Rust crate, the Linux driver — has it working either), so it
+> does nothing on this hardware. The plumbing is left in place in case a future
+> module fires it.
+
+The **Cirque Pinnacle** (GlidePoint Circle) is **single-touch hardware** — it can only track one finger at a time. It therefore cannot do any two-finger or three-finger gesture, and double-tap-drag is not implemented for it; it provides cursor movement, tap-to-click, and scroll. This is a hardware limitation of the Pinnacle, not a firmware choice.
