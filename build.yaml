@@ -163,18 +163,6 @@ include:
     cmake-args: -DCONFIG_ZMK_SPLIT_CENTRAL_STATUS_MIRROR=y -DDTS_EXTRA_CPPFLAGS="-DDEFAULT_TYPING_LAYER=4;-DTRACKPAD_CENTRAL=1"
     artifact-name: trackpad_central_right_corne_eclipse_colemak.zmk
 
-  # ===================== ZOOM TEST (temporary) =====================
-  # Right trackpad half with GESTURE_DEBUG: the zoom gesture is emitted as a
-  # plain (sensitive) scroll instead of the Ctrl+scroll codes, so a pinch is
-  # visibly testable with no host mapping. If a pinch scrolls the page, the
-  # chip+driver detect zoom and only the host Ctrl+scroll mapping needs fixing;
-  # if nothing happens, the chip isn't flagging zoom. (USB logging can't run on
-  # a split peripheral, so this visible test replaces a serial log.) REMOVE after.
-  - board: nice_nano_v2
-    shield: corne_eclipse_right
-    cmake-args: -DCONFIG_INPUT_AZOTEQ_IQS5XX=y -DCONFIG_INPUT_PINNACLE=y -DCONFIG_I2C=y -DCONFIG_ZMK_DISPLAY=n -DCONFIG_INPUT_AZOTEQ_IQS5XX_GESTURE_DEBUG=y -DDTS_EXTRA_CPPFLAGS="-DTRACKPAD_PERIPHERAL=1"
-    artifact-name: trackpad_peripheral_right_corne_eclipse_zoomtest.zmk
-
   # ===================== rgb_while_building (dev tool) =====================
   # RGB enabled at boot; smart-idle still active (LEDs follow the usual
   # fade-off rules). QWERTY, no trackpad. Useful during assembly. Not daily.
