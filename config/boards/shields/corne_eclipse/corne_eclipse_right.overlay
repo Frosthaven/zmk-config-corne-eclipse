@@ -60,7 +60,7 @@
         drag-requires-double-tap;
         scroll;
         zoom;
-        flip-x;
+        switch-xy;
     };
 
     cirque_tp: cirque_pinnacle@2a {
