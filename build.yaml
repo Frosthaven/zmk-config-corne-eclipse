@@ -163,6 +163,15 @@ include:
     cmake-args: -DCONFIG_ZMK_SPLIT_CENTRAL_STATUS_MIRROR=y -DDTS_EXTRA_CPPFLAGS="-DDEFAULT_TYPING_LAYER=4;-DTRACKPAD_CENTRAL=1"
     artifact-name: trackpad_central_right_corne_eclipse_colemak.zmk
 
+  # ===================== DEBUG (temporary) =====================
+  # Right trackpad half with USB logging + raw gesture logging, to capture what
+  # the Azoteq chip reports during a pinch. Flash to the RIGHT half, plug it
+  # into USB, read the serial console while pinching. REMOVE after debugging.
+  - board: nice_nano_v2
+    shield: corne_eclipse_right
+    cmake-args: -DCONFIG_INPUT_AZOTEQ_IQS5XX=y -DCONFIG_INPUT_PINNACLE=y -DCONFIG_I2C=y -DCONFIG_ZMK_DISPLAY=n -DCONFIG_ZMK_USB_LOGGING=y -DCONFIG_INPUT_AZOTEQ_IQS5XX_GESTURE_DEBUG=y -DCONFIG_INPUT_LOG_LEVEL_INF=y -DDTS_EXTRA_CPPFLAGS="-DTRACKPAD_PERIPHERAL=1"
+    artifact-name: trackpad_peripheral_right_corne_eclipse_debug.zmk
+
   # ===================== rgb_while_building (dev tool) =====================
   # RGB enabled at boot; smart-idle still active (LEDs follow the usual
   # fade-off rules). QWERTY, no trackpad. Useful during assembly. Not daily.
