@@ -19,8 +19,8 @@ manifest:
       remote: frosthaven
       revision: main
     - name: zmk-driver-azoteq-iqs5xx
-      remote: aym1607
-      revision: main
+      remote: frosthaven
+      revision: gestures
     - name: cirque-input-module
       remote: petejohanson
       revision: main

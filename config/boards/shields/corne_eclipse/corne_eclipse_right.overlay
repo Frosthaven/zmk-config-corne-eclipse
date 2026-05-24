@@ -57,7 +57,9 @@
         one-finger-tap;
         two-finger-tap;
         press-and-hold;
+        drag-requires-double-tap;
         scroll;
+        zoom;
         flip-x;
     };
 
