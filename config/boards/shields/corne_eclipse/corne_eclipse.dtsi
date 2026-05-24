@@ -170,9 +170,7 @@ RC(2,1) RC(2,2) RC(2,3) RC(2,4) RC(2,5)  RC(2,6) RC(2,7) RC(2,8) RC(2,9) RC(2,10
         compatible = "alps,ec11";
         a-gpios = <&pro_micro 8 (GPIO_ACTIVE_HIGH | GPIO_PULL_UP)>;
         b-gpios = <&pro_micro 9 (GPIO_ACTIVE_HIGH | GPIO_PULL_UP)>;
-        // ~4x the detent count so each click emits ~1 volume event instead of
-        // several (the old 20 understated the encoder's pulses-per-rotation).
-        steps = <80>;
+        steps = <20>;
         status = "disabled";
     };
 
