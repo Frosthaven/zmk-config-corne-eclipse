@@ -168,29 +168,26 @@ RC(2,1) RC(2,2) RC(2,3) RC(2,4) RC(2,5)  RC(2,6) RC(2,7) RC(2,8) RC(2,9) RC(2,10
 
     /* ENCODER TUNING -- both encoders are Alps EC12 (24 detents / 24 pulses).
      *
-     * The ZMK `alps,ec11` driver counts all 4 quadrature edges per electrical
-     * pulse. For one activation per physical detent:
-     *     activations/detent = (edges/detent) * T / steps   (T = triggers-per-rotation)
-     * so steps = (edges/detent) * T; the detent count cancels out. EC12 24/24 =
-     * 1 detent per pulse = 4 edges/detent, so the datasheet-exact value (matching
-     * the zmk#2666 thread, which got clean 1:1 with these) is:
-     *     steps = 4 * T = 4 * 20 = 80,  triggers-per-rotation = 20.
-     * (An EC11/EC11E is 2 edges/detent -> steps = 2 * T = 40.)
+     * Per the zmk#2666 maintainer guidance: set triggers-per-rotation to the
+     * DETENT COUNT, and steps to 2x or 4x that (4x when 1 pulse/detent, 2x when
+     * 2 detents/pulse). EC12 24/24 = 1 pulse/detent (4 edges/detent), so:
+     *     triggers-per-rotation = 24 (detents),  steps = 4 * 24 = 96.
+     * Reference: EC11 30/15 (2 detents/pulse) -> T = 30, steps = 60 (2x).
      *
      * PULL-UP: this board has NO external pull-up on the encoder lines -- the
      * MCU internal | GPIO_PULL_UP is REQUIRED. (zmk#2666 suggests removing it,
      * but that only works on boards with an external pull-up/debounce RC; tried
      * here and BOTH encoders went dead, so the flag stays.)
      *
-     * History: with the pull-up, an earlier sweep saw steps=80 occasionally drop
-     * slow single clicks (the encoder intermittently emits <4 edges/detent), and
-     * steps=64 tested as a lower-error balance. Now using the exact 80 per the
-     * thread; if clicks drop again, steps=64 is the fallback. */
+     * History: earlier used the 20-detent values (steps=80/T=20) which are wrong
+     * for a 24/24 part; an empirical sweep at T=20 landed ~steps=64 as a
+     * lower-error balance against the encoder's edge jitter. If 96/24 still drops
+     * or doubles clicks, re-bias steps (lower = fewer misses / more doubles). */
     left_encoder: left_encoder {
         compatible = "alps,ec11";
         a-gpios = <&pro_micro 8 (GPIO_ACTIVE_HIGH | GPIO_PULL_UP)>;
         b-gpios = <&pro_micro 9 (GPIO_ACTIVE_HIGH | GPIO_PULL_UP)>;
-        steps = <80>; /* EC12 24/24 exact: 4 edges/detent * T(20); fallback 64. See note */
+        steps = <96>; /* EC12 24/24: 4 edges/detent * T(24); see note above */
         status = "disabled";
     };
 
@@ -198,14 +195,14 @@ RC(2,1) RC(2,2) RC(2,3) RC(2,4) RC(2,5)  RC(2,6) RC(2,7) RC(2,8) RC(2,9) RC(2,10
         compatible = "alps,ec11";
         a-gpios = <&pro_micro 9 (GPIO_ACTIVE_HIGH | GPIO_PULL_UP)>;
         b-gpios = <&pro_micro 8 (GPIO_ACTIVE_HIGH | GPIO_PULL_UP)>;
-        steps = <80>; /* EC12 24/24 exact: 4 edges/detent * T(20); fallback 64. See note */
+        steps = <96>; /* EC12 24/24: 4 edges/detent * T(24); see note above */
         status = "disabled";
     };
 
     sensors {
         compatible = "zmk,keymap-sensors";
         sensors = <&left_encoder &right_encoder>;
-        triggers-per-rotation = <20>; /* shared; steps=4*T per EC12 encoder (see note above) */
+        triggers-per-rotation = <24>; /* = EC12 detent count; steps = 4*T (see note above) */
     };
 };
 
