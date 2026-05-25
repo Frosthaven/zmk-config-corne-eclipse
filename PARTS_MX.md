@@ -42,7 +42,7 @@ I haven't yet verified the exact screws, so this list may not be exact. YMMV.
 |----------|---------|------|-------|
 | ✅ | 10 | [M2x8mm Countersunk Screws](https://www.aliexpress.us/item/2251832781782755.html) | Standoff bottom case screws. |
 | ✅ | 36 | [M2x5mm Button Head Screws](https://www.aliexpress.us/item/2251832780910689.html) | Standoff top plate screws. |
-| ✅ | 10 | [M2x4mm Female-Female Standoffs](https://www.amazon.com/dp/B0FLGTQZNN) |  |
+| ✅ | 10 | [M2x8mm Female-Female Standoffs](https://www.amazon.com/dp/B0FLGTHV32?th=1) |  |
 
 ## Fabrication
 
