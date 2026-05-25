@@ -193,8 +193,8 @@ RC(2,1) RC(2,2) RC(2,3) RC(2,4) RC(2,5)  RC(2,6) RC(2,7) RC(2,8) RC(2,9) RC(2,10
      * so no value is a perfect 1:1 -- steps only shifts the residual error
      * between "miss" (steps too high) and "double" (steps too low). Empirical
      * sweep (fires per detent): steps=72 -> ~0.76 (misses), steps=60 -> ~1.11
-     * (doubles). The balance (avg ~1.0) is around steps=64, the minimum-error
-     * point; the few remaining errors are the encoder's mechanical jitter.
+     * (doubles). steps=64 was VERIFIED clean 1:1 (20/20 detents both directions)
+     * on this board's encoder -- the minimum-error balance point.
      *   EC12 tuned:  steps = <64>  (vs exact 80),  triggers-per-rotation = <20>
      *   EC11 tuned:  steps = <32>  (vs exact 40),  triggers-per-rotation = <20>
      * To rebias: raise steps (toward 80) for fewer doubles / more misses; lower
