@@ -11,6 +11,9 @@ jobs:
   release:
     name: Draft Release
     needs: [build]
+    # Only branch builds against `main` draft a release; other branches
+    # (e.g. v3-choc-mx) still build firmware but produce no draft.
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     permissions:
       contents: write
