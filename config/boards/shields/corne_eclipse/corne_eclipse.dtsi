@@ -166,62 +166,50 @@ RC(2,1) RC(2,2) RC(2,3) RC(2,4) RC(2,5)  RC(2,6) RC(2,7) RC(2,8) RC(2,9) RC(2,10
 
     };
 
-    /* ENCODER TUNING -- currently set for Alps EC12 (this board's hardware).
+    /* ENCODER TUNING -- both encoders are Alps EC12 (24 detents / 24 pulses).
      *
      * The ZMK `alps,ec11` driver counts all 4 quadrature edges per electrical
-     * pulse. For one activation per physical detent you want:
-     *     triggers-per-rotation = detent count        (sensors node, below)
-     *     steps                 = total edges/rotation = 4 * pulses/rotation
-     * so one trigger boundary (every 360/T deg) lands on each click.
+     * pulse. For exactly one activation per physical detent:
+     *     activations/detent = (edges/detent) * T / steps   (T = triggers-per-rotation)
+     * so steps = (edges/detent) * T. The DETENT COUNT cancels out -- only the
+     * edges/detent and the steps:T ratio matter. EC12 24/24 = 1 detent per pulse
+     * = 4 edges/detent, so steps = 4 * T = 4 * 20 = 80. (An EC11/EC11E is 2
+     * edges/detent -> steps = 2 * T = 40.) `steps` is per-encoder; `T` is shared.
      *
-     * EXACT (theoretical) values:
-     *   Alps EC12:  20 detents / 20 pulses (1 detent = 1 pulse, 4 edges/detent)
-     *               -> steps = 80,  triggers-per-rotation = 20
-     *   Alps EC11 (EC11E): detents = 2 * pulses (2 edges/detent), e.g. 20-detent
-     *               part = 20 detents / 10 pulses -> steps = 40, T = 20
-     *               (general EC11: steps = 2 * detent count, T = detent count)
+     * SIGNAL FIX (zmk#2666): one of the two encoders was intermittently dropping a
+     * quadrature edge per detent, so it fell short of the 18 deg trigger boundary
+     * and missed clicks. zmk#2666 reporters traced this to the MCU's internal
+     * GPIO_PULL_UP fighting the board's external pull-up/debounce RC; removing
+     * | GPIO_PULL_UP cleaned up the edges. We do that here (see a/b-gpios below) and
+     * return steps to the exact 80 -- with a clean 4-edge signal the boundary lands
+     * on every click. RESTORE the | GPIO_PULL_UP flags if an encoder goes dead.
      *
-     * MARGIN (what we actually ship): the exact EC12 value (80) put the trigger
-     * boundary EXACTLY on the detent boundary (18 deg each), leaving zero slack --
-     * a detent landing a hair short of 18 deg dropped that click (observed on slow
-     * single clicks). Two things help: (1) pick a steps where 360/steps is a WHOLE
-     * number, so the driver reports whole degrees per edge and there is no
-     * fractional remainder to mis-round (the fractional path truncates differently
-     * CW vs CCW, which can drop clicks in one direction); (2) run steps below the
-     * exact edge count so each detent clears the 18 deg threshold with surplus.
-     * This board's EC12 emits an INCONSISTENT number of edges per detent (~2-4),
-     * so no value is a perfect 1:1 -- steps only shifts the residual error
-     * between "miss" (steps too high) and "double" (steps too low). Empirical
-     * sweep (fires per detent): steps=72 -> ~0.76 (misses), steps=60 -> ~1.11
-     * (doubles). steps=64 was VERIFIED clean 1:1 (20/20 detents both directions)
-     * on this board's encoder -- the minimum-error balance point.
-     *   EC12 tuned:  steps = <64>  (vs exact 80),  triggers-per-rotation = <20>
-     *   EC11 tuned:  steps = <32>  (vs exact 40),  triggers-per-rotation = <20>
-     * To rebias: raise steps (toward 80) for fewer doubles / more misses; lower
-     * steps (toward 45) for fewer misses / more doubles.
-     *
-     * History: steps=20/T=10 on the EC12 gave 80*10/20 = 40 triggers/rotation =
-     * 2 per detent, and T=10 never aligned boundaries to the 20 clicks. */
+     * History: before removing the pull-up we masked the dropped edges by lowering
+     * steps (sweep: 72->~0.76 fires/detent, 60->~1.11, 64 was the balance point) --
+     * a compromise that traded misses for doubles. If steps=80 + no-pull-up still
+     * drops clicks, that earlier margin tuning (steps ~64) is the fallback. */
     left_encoder: left_encoder {
         compatible = "alps,ec11";
-        a-gpios = <&pro_micro 8 (GPIO_ACTIVE_HIGH | GPIO_PULL_UP)>;
-        b-gpios = <&pro_micro 9 (GPIO_ACTIVE_HIGH | GPIO_PULL_UP)>;
-        steps = <64>; /* EC12, margin-tuned, balance point (exact = 80); see note above */
+        /* zmk#2666: internal pull-up removed (was: | GPIO_PULL_UP) to stop dropped edges */
+        a-gpios = <&pro_micro 8 GPIO_ACTIVE_HIGH>;
+        b-gpios = <&pro_micro 9 GPIO_ACTIVE_HIGH>;
+        steps = <80>; /* EC12 24/24 exact: 4 edges/detent * T(20); see note above */
         status = "disabled";
     };
 
     right_encoder: right_encoder {
         compatible = "alps,ec11";
-        a-gpios = <&pro_micro 9 (GPIO_ACTIVE_HIGH | GPIO_PULL_UP)>;
-        b-gpios = <&pro_micro 8 (GPIO_ACTIVE_HIGH | GPIO_PULL_UP)>;
-        steps = <64>; /* EC12, margin-tuned, balance point (exact = 80); see note above */
+        /* zmk#2666: internal pull-up removed (was: | GPIO_PULL_UP) to stop dropped edges */
+        a-gpios = <&pro_micro 9 GPIO_ACTIVE_HIGH>;
+        b-gpios = <&pro_micro 8 GPIO_ACTIVE_HIGH>;
+        steps = <80>; /* EC12 24/24 exact: 4 edges/detent * T(20); see note above */
         status = "disabled";
     };
 
     sensors {
         compatible = "zmk,keymap-sensors";
         sensors = <&left_encoder &right_encoder>;
-        triggers-per-rotation = <20>; /* = detent count; EC12=20, EC11=detents (see encoder note above) */
+        triggers-per-rotation = <20>; /* shared; steps=4*T per EC12 encoder (see note above) */
     };
 };
 
