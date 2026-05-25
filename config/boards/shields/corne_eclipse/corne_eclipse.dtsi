@@ -183,15 +183,19 @@ RC(2,1) RC(2,2) RC(2,3) RC(2,4) RC(2,5)  RC(2,6) RC(2,7) RC(2,8) RC(2,9) RC(2,10
      *
      * MARGIN (what we actually ship): the exact EC12 value (80) put the trigger
      * boundary EXACTLY on the detent boundary (18 deg each), leaving zero slack --
-     * a detent that landed a hair short of 18 deg dropped that click entirely
-     * (observed: some slow single clicks didn't register). We run steps ~5% BELOW
-     * the exact edge count so each detent reports a small surplus over the 18 deg
-     * threshold and a marginally-short detent still fires. Trade-off: a rare
-     * double when spinning continuously (surplus accumulates ~1 extra per turn).
-     *   EC12 tuned:  steps = <76>  (vs exact 80),  triggers-per-rotation = <20>
-     *   EC11 tuned:  steps = <38>  (vs exact 40),  triggers-per-rotation = <20>
-     * If clicks still drop, lower steps further; if it double-fires, raise toward
-     * the exact value.
+     * a detent landing a hair short of 18 deg dropped that click (observed on slow
+     * single clicks). Two things help: (1) pick a steps where 360/steps is a WHOLE
+     * number, so the driver reports whole degrees per edge and there is no
+     * fractional remainder to mis-round (the fractional path truncates differently
+     * CW vs CCW, which can drop clicks in one direction); (2) run steps below the
+     * exact edge count so each detent clears the 18 deg threshold with surplus.
+     * steps=72 does both: 360/72 = 5 deg/edge exactly, 4 edges = 20 deg/detent
+     * (2 deg over threshold). Trade-off: a rare double on continuous spinning
+     * (surplus accumulates ~1 extra every ~9 detents).
+     *   EC12 tuned:  steps = <72>  (vs exact 80),  triggers-per-rotation = <20>
+     *   EC11 tuned:  steps = <36>  (vs exact 40),  triggers-per-rotation = <20>
+     * If clicks still drop, lower steps further (e.g. 60); if it double-fires too
+     * often, raise toward the exact value (e.g. 76, 80).
      *
      * History: steps=20/T=10 on the EC12 gave 80*10/20 = 40 triggers/rotation =
      * 2 per detent, and T=10 never aligned boundaries to the 20 clicks. */
@@ -199,7 +203,7 @@ RC(2,1) RC(2,2) RC(2,3) RC(2,4) RC(2,5)  RC(2,6) RC(2,7) RC(2,8) RC(2,9) RC(2,10
         compatible = "alps,ec11";
         a-gpios = <&pro_micro 8 (GPIO_ACTIVE_HIGH | GPIO_PULL_UP)>;
         b-gpios = <&pro_micro 9 (GPIO_ACTIVE_HIGH | GPIO_PULL_UP)>;
-        steps = <76>; /* EC12, margin-tuned (exact = 80); see note above */
+        steps = <72>; /* EC12, margin-tuned, 360/72=5deg/edge (exact = 80); see note above */
         status = "disabled";
     };
 
@@ -207,7 +211,7 @@ RC(2,1) RC(2,2) RC(2,3) RC(2,4) RC(2,5)  RC(2,6) RC(2,7) RC(2,8) RC(2,9) RC(2,10
         compatible = "alps,ec11";
         a-gpios = <&pro_micro 9 (GPIO_ACTIVE_HIGH | GPIO_PULL_UP)>;
         b-gpios = <&pro_micro 8 (GPIO_ACTIVE_HIGH | GPIO_PULL_UP)>;
-        steps = <76>; /* EC12, margin-tuned (exact = 80); see note above */
+        steps = <72>; /* EC12, margin-tuned, 360/72=5deg/edge (exact = 80); see note above */
         status = "disabled";
     };
 
