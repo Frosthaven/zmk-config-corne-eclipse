@@ -189,17 +189,16 @@ RC(2,1) RC(2,2) RC(2,3) RC(2,4) RC(2,5)  RC(2,6) RC(2,7) RC(2,8) RC(2,9) RC(2,10
      * fractional remainder to mis-round (the fractional path truncates differently
      * CW vs CCW, which can drop clicks in one direction); (2) run steps below the
      * exact edge count so each detent clears the 18 deg threshold with surplus.
-     * This board's EC12 also intermittently reports only ~3 edges on some detents
-     * instead of 4, so a detent can fall short of the threshold and drop the
-     * click. Measured fire rate: steps=72 -> ~76% (too many misses). We lower
-     * steps so even a 3-edge detent clears the threshold: at steps=60
-     * (360/60 = 6 deg/edge), 3 edges = 18 deg (just fires), 4 edges = 24 deg.
-     * NOTE: because edges/detent is inconsistent (3 vs 4) there is no perfect
-     * 1:1 -- lowering steps trades misses for occasional doubles. Tune to taste.
-     *   EC12 tuned:  steps = <60>  (vs exact 80),  triggers-per-rotation = <20>
-     *   EC11 tuned:  steps = <30>  (vs exact 40),  triggers-per-rotation = <20>
-     * If clicks still drop, lower steps further (e.g. 45); if it double-fires too
-     * often, raise it (e.g. 72, 76, 80).
+     * This board's EC12 emits an INCONSISTENT number of edges per detent (~2-4),
+     * so no value is a perfect 1:1 -- steps only shifts the residual error
+     * between "miss" (steps too high) and "double" (steps too low). Empirical
+     * sweep (fires per detent): steps=72 -> ~0.76 (misses), steps=60 -> ~1.11
+     * (doubles). The balance (avg ~1.0) is around steps=64, the minimum-error
+     * point; the few remaining errors are the encoder's mechanical jitter.
+     *   EC12 tuned:  steps = <64>  (vs exact 80),  triggers-per-rotation = <20>
+     *   EC11 tuned:  steps = <32>  (vs exact 40),  triggers-per-rotation = <20>
+     * To rebias: raise steps (toward 80) for fewer doubles / more misses; lower
+     * steps (toward 45) for fewer misses / more doubles.
      *
      * History: steps=20/T=10 on the EC12 gave 80*10/20 = 40 triggers/rotation =
      * 2 per detent, and T=10 never aligned boundaries to the 20 clicks. */
@@ -207,7 +206,7 @@ RC(2,1) RC(2,2) RC(2,3) RC(2,4) RC(2,5)  RC(2,6) RC(2,7) RC(2,8) RC(2,9) RC(2,10
         compatible = "alps,ec11";
         a-gpios = <&pro_micro 8 (GPIO_ACTIVE_HIGH | GPIO_PULL_UP)>;
         b-gpios = <&pro_micro 9 (GPIO_ACTIVE_HIGH | GPIO_PULL_UP)>;
-        steps = <60>; /* EC12, margin-tuned, 360/60=6deg/edge (exact = 80); see note above */
+        steps = <64>; /* EC12, margin-tuned, balance point (exact = 80); see note above */
         status = "disabled";
     };
 
@@ -215,7 +214,7 @@ RC(2,1) RC(2,2) RC(2,3) RC(2,4) RC(2,5)  RC(2,6) RC(2,7) RC(2,8) RC(2,9) RC(2,10
         compatible = "alps,ec11";
         a-gpios = <&pro_micro 9 (GPIO_ACTIVE_HIGH | GPIO_PULL_UP)>;
         b-gpios = <&pro_micro 8 (GPIO_ACTIVE_HIGH | GPIO_PULL_UP)>;
-        steps = <60>; /* EC12, margin-tuned, 360/60=6deg/edge (exact = 80); see note above */
+        steps = <64>; /* EC12, margin-tuned, balance point (exact = 80); see note above */
         status = "disabled";
     };
 
