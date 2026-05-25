@@ -166,13 +166,25 @@ RC(2,1) RC(2,2) RC(2,3) RC(2,4) RC(2,5)  RC(2,6) RC(2,7) RC(2,8) RC(2,9) RC(2,10
 
     };
 
-    /* Alps EC12: 20 detents / 20 pulses per 360deg = 1 detent per electrical
-     * pulse. The driver counts all 4 quadrature edges per pulse, so a full
-     * rotation = 80 edges (steps) over 20 detents. For one trigger per detent,
-     * triggers-per-rotation must equal the detent count (20): the behavior fires
-     * once per 360/T degrees, so T=20 puts a trigger boundary on every click.
-     * (At steps=20 / T=10 the engine saw 80*10/20 = 40 triggers/rotation = 2 per
-     * detent; T=10 also never aligned boundaries to clicks.) */
+    /* ENCODER TUNING -- currently set for Alps EC12 (this board's hardware).
+     *
+     * The ZMK `alps,ec11` driver counts all 4 quadrature edges per electrical
+     * pulse. For exactly one activation per physical detent you want:
+     *     triggers-per-rotation = detent count        (sensors node, below)
+     *     steps                 = total edges/rotation = 4 * pulses/rotation
+     * so that one trigger boundary (every 360/T deg) lands on each click.
+     *
+     *   Alps EC12:  20 detents / 20 pulses per rotation (1 detent = 1 pulse,
+     *               4 edges/detent)  ->  steps = <80>,  triggers-per-rotation = <20>
+     *
+     *   Alps EC11 (EC11E): detents = 2 * pulses (2 edges/detent), e.g. common
+     *               20-detent part = 20 detents / 10 pulses
+     *                              ->  steps = <40>,  triggers-per-rotation = <20>
+     *               (general EC11: steps = 2 * detent count, T = detent count;
+     *                e.g. 18 det -> steps=36/T=18, 30 det -> steps=60/T=30)
+     *
+     * History: steps=20/T=10 on the EC12 gave 80*10/20 = 40 triggers/rotation =
+     * 2 per detent, and T=10 never aligned boundaries to the 20 clicks. */
     left_encoder: left_encoder {
         compatible = "alps,ec11";
         a-gpios = <&pro_micro 8 (GPIO_ACTIVE_HIGH | GPIO_PULL_UP)>;
@@ -192,7 +204,7 @@ RC(2,1) RC(2,2) RC(2,3) RC(2,4) RC(2,5)  RC(2,6) RC(2,7) RC(2,8) RC(2,9) RC(2,10
     sensors {
         compatible = "zmk,keymap-sensors";
         sensors = <&left_encoder &right_encoder>;
-        triggers-per-rotation = <20>;
+        triggers-per-rotation = <20>; /* = detent count; EC12=20, EC11=detents (see encoder note above) */
     };
 };
 
