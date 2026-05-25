@@ -166,11 +166,16 @@ RC(2,1) RC(2,2) RC(2,3) RC(2,4) RC(2,5)  RC(2,6) RC(2,7) RC(2,8) RC(2,9) RC(2,10
 
     };
 
+    /* EC12 encoders: 4 quadrature edges per detent. The driver counts edges and
+     * triggers-per-rotation (below) fires one event per 360/T degrees, so
+     * triggers/detent = edges_per_detent * T / steps. steps = 4 * T (= 40) lands
+     * exactly one trigger per physical click. (At steps=20 it double-triggered:
+     * one event mid-detent and one at the detent.) */
     left_encoder: left_encoder {
         compatible = "alps,ec11";
         a-gpios = <&pro_micro 8 (GPIO_ACTIVE_HIGH | GPIO_PULL_UP)>;
         b-gpios = <&pro_micro 9 (GPIO_ACTIVE_HIGH | GPIO_PULL_UP)>;
-        steps = <20>;
+        steps = <40>;
         status = "disabled";
     };
 
@@ -178,7 +183,7 @@ RC(2,1) RC(2,2) RC(2,3) RC(2,4) RC(2,5)  RC(2,6) RC(2,7) RC(2,8) RC(2,9) RC(2,10
         compatible = "alps,ec11";
         a-gpios = <&pro_micro 9 (GPIO_ACTIVE_HIGH | GPIO_PULL_UP)>;
         b-gpios = <&pro_micro 8 (GPIO_ACTIVE_HIGH | GPIO_PULL_UP)>;
-        steps = <20>;
+        steps = <40>;
         status = "disabled";
     };
 
