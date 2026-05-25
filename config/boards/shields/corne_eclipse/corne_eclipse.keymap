@@ -75,7 +75,7 @@
     zoom_encoder: zoom_encoder {
       compatible = "zmk,behavior-sensor-rotate";
       #sensor-binding-cells = <0>;
-      bindings = <&zoom_in>, <&zoom_out>;
+      bindings = <&zoom_out>, <&zoom_in>;
       tap-ms = <100>;
     };
   };
