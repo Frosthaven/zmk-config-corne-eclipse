@@ -169,19 +169,29 @@ RC(2,1) RC(2,2) RC(2,3) RC(2,4) RC(2,5)  RC(2,6) RC(2,7) RC(2,8) RC(2,9) RC(2,10
     /* ENCODER TUNING -- currently set for Alps EC12 (this board's hardware).
      *
      * The ZMK `alps,ec11` driver counts all 4 quadrature edges per electrical
-     * pulse. For exactly one activation per physical detent you want:
+     * pulse. For one activation per physical detent you want:
      *     triggers-per-rotation = detent count        (sensors node, below)
      *     steps                 = total edges/rotation = 4 * pulses/rotation
-     * so that one trigger boundary (every 360/T deg) lands on each click.
+     * so one trigger boundary (every 360/T deg) lands on each click.
      *
-     *   Alps EC12:  20 detents / 20 pulses per rotation (1 detent = 1 pulse,
-     *               4 edges/detent)  ->  steps = <80>,  triggers-per-rotation = <20>
+     * EXACT (theoretical) values:
+     *   Alps EC12:  20 detents / 20 pulses (1 detent = 1 pulse, 4 edges/detent)
+     *               -> steps = 80,  triggers-per-rotation = 20
+     *   Alps EC11 (EC11E): detents = 2 * pulses (2 edges/detent), e.g. 20-detent
+     *               part = 20 detents / 10 pulses -> steps = 40, T = 20
+     *               (general EC11: steps = 2 * detent count, T = detent count)
      *
-     *   Alps EC11 (EC11E): detents = 2 * pulses (2 edges/detent), e.g. common
-     *               20-detent part = 20 detents / 10 pulses
-     *                              ->  steps = <40>,  triggers-per-rotation = <20>
-     *               (general EC11: steps = 2 * detent count, T = detent count;
-     *                e.g. 18 det -> steps=36/T=18, 30 det -> steps=60/T=30)
+     * MARGIN (what we actually ship): the exact EC12 value (80) put the trigger
+     * boundary EXACTLY on the detent boundary (18 deg each), leaving zero slack --
+     * a detent that landed a hair short of 18 deg dropped that click entirely
+     * (observed: some slow single clicks didn't register). We run steps ~5% BELOW
+     * the exact edge count so each detent reports a small surplus over the 18 deg
+     * threshold and a marginally-short detent still fires. Trade-off: a rare
+     * double when spinning continuously (surplus accumulates ~1 extra per turn).
+     *   EC12 tuned:  steps = <76>  (vs exact 80),  triggers-per-rotation = <20>
+     *   EC11 tuned:  steps = <38>  (vs exact 40),  triggers-per-rotation = <20>
+     * If clicks still drop, lower steps further; if it double-fires, raise toward
+     * the exact value.
      *
      * History: steps=20/T=10 on the EC12 gave 80*10/20 = 40 triggers/rotation =
      * 2 per detent, and T=10 never aligned boundaries to the 20 clicks. */
@@ -189,7 +199,7 @@ RC(2,1) RC(2,2) RC(2,3) RC(2,4) RC(2,5)  RC(2,6) RC(2,7) RC(2,8) RC(2,9) RC(2,10
         compatible = "alps,ec11";
         a-gpios = <&pro_micro 8 (GPIO_ACTIVE_HIGH | GPIO_PULL_UP)>;
         b-gpios = <&pro_micro 9 (GPIO_ACTIVE_HIGH | GPIO_PULL_UP)>;
-        steps = <80>;
+        steps = <76>; /* EC12, margin-tuned (exact = 80); see note above */
         status = "disabled";
     };
 
@@ -197,7 +207,7 @@ RC(2,1) RC(2,2) RC(2,3) RC(2,4) RC(2,5)  RC(2,6) RC(2,7) RC(2,8) RC(2,9) RC(2,10
         compatible = "alps,ec11";
         a-gpios = <&pro_micro 9 (GPIO_ACTIVE_HIGH | GPIO_PULL_UP)>;
         b-gpios = <&pro_micro 8 (GPIO_ACTIVE_HIGH | GPIO_PULL_UP)>;
-        steps = <80>;
+        steps = <76>; /* EC12, margin-tuned (exact = 80); see note above */
         status = "disabled";
     };
 
