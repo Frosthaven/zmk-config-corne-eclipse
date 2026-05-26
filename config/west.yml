@@ -16,7 +16,10 @@ manifest:
       # Pinned to an exact commit (not the branch): CI caches west modules keyed
       # on west.yml's hash, so a new branch commit would be served stale. Bump
       # this SHA on every ZMK-fork change. (= v0.3-peripheral-charging-bit HEAD)
-      revision: 0f70feb9c750905660c46d12b7194ec9e03a8610
+      # d5963f2: smart-idle char ordered before the input-split chars + central
+      # records its write handle without subscribing to NOTIFY -> fixes the
+      # central->peripheral idle-activity sync on trackpad-on-peripheral builds.
+      revision: d5963f25d6b314657694294792f61cb0ee90bfab
       import: app/west.yml
     - name: zmk-ext-power-smart-idle
       remote: frosthaven
