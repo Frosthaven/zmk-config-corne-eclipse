@@ -30,7 +30,9 @@ manifest:
       # modules keyed on west.yml's hash and runs `west update --fetch smart`, so
       # pushing new branch commits without changing this file would silently
       # reuse a stale cached checkout. Bump this SHA on every driver change.
-      revision: 8b00e70b92edfd7ec0daccf0d0c6a378ca63d2a5
+      # 35fac92: a moving two-finger touch is treated as scroll, never a tap, so
+      # scrolling no longer misfires a right-click.
+      revision: 35fac92ffbb41df37ffd7bbd3439c08b243df272
     - name: cirque-input-module
       remote: petejohanson
       revision: main
