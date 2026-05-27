@@ -14,8 +14,15 @@
 #include <dt-bindings/zmk/rgb.h>
 #include <dt-bindings/zmk/ext_power.h>
 #include <dt-bindings/zmk/outputs.h>
+#define ZMK_POINTING_DEFAULT_MOVE_VAL 1200
 #define ZMK_POINTING_DEFAULT_SCRL_VAL 25
 #include <dt-bindings/zmk/pointing.h>
+
+/* Mouse cursor acceleration: ramp 0 -> max move value (1200) over 500ms
+ * (ZMK default time-to-max-speed-ms is 300). */
+&mmv {
+    time-to-max-speed-ms = <500>;
+};
 
 /* BEHAVIORS *******************************************************************
 *******************************************************************************/
