@@ -30,9 +30,10 @@ manifest:
       # modules keyed on west.yml's hash and runs `west update --fetch smart`, so
       # pushing new branch commits without changing this file would silently
       # reuse a stale cached checkout. Bump this SHA on every driver change.
-      # 9c6f2be: PM device action so the trackpad re-arms its RDY interrupt and
-      # re-applies chip config on PM_DEVICE_ACTION_RESUME (CONFIG_ZMK_SLEEP wake).
-      revision: 9c6f2be018569097167434be20c5934ef024bd5c
+      # fe0acfd: cursor-scale-percent DT prop applied to REL_X/Y -- we set 75 in
+      # our DT to slow the cursor 25%. Earlier 9c6f2be: PM device action so the
+      # trackpad re-arms its RDY interrupt and re-applies chip config on resume.
+      revision: fe0acfd57104137cdbc41122aad78f20937225ea
     - name: cirque-input-module
       remote: frosthaven
       # Pinned to our fork at an exact commit. Includes petejohanson's
