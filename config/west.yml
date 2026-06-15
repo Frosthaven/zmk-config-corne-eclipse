@@ -30,11 +30,14 @@ manifest:
       # modules keyed on west.yml's hash and runs `west update --fetch smart`, so
       # pushing new branch commits without changing this file would silently
       # reuse a stale cached checkout. Bump this SHA on every driver change.
-      # 35fac92: a moving two-finger touch is treated as scroll, never a tap, so
-      # scrolling no longer misfires a right-click.
-      revision: 35fac92ffbb41df37ffd7bbd3439c08b243df272
+      # 9c6f2be: PM device action so the trackpad re-arms its RDY interrupt and
+      # re-applies chip config on PM_DEVICE_ACTION_RESUME (CONFIG_ZMK_SLEEP wake).
+      revision: 9c6f2be018569097167434be20c5934ef024bd5c
     - name: cirque-input-module
-      remote: petejohanson
-      revision: main
+      remote: frosthaven
+      # Pinned to our fork at an exact commit. Includes petejohanson's
+      # feat/idle-waker-wake-from-sleep-fixes (Cirque PM device action so the
+      # trackpad recovers cleanly when the SoC wakes from CONFIG_ZMK_SLEEP).
+      revision: c9d41b4dc74b898b53fb1643f38823c0c5f8ee19
   self:
     path: config
