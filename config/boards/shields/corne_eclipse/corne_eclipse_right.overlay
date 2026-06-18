@@ -63,7 +63,7 @@
         /* zoom; -- disabled: the 43mm pad is too small for the chip to detect a
          * pinch reliably, and at sensitive thresholds it steals scroll. */
         flip-x;
-        cursor-scale-percent = <75>;
+        cursor-scale-percent = <65>;
     };
 
     cirque_tp: cirque_pinnacle@2a {
