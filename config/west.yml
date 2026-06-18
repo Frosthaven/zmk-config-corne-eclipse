@@ -30,14 +30,14 @@ manifest:
       # modules keyed on west.yml's hash and runs `west update --fetch smart`, so
       # pushing new branch commits without changing this file would silently
       # reuse a stale cached checkout. Bump this SHA on every driver change.
-      # 870a830: tap-then-hold engagement deferred until motion -- a quick
-      # second tap (= double-click) now lifts before drag latches; emit_click
-      # release-firsts a still-held button so two fast taps land as two
-      # clicks; scroll slowdown halved (cursor=50 -> scroll_div=42 vs the
-      # prior 64) so the wheel doesn't feel as heavy as the cursor.
-      # Earlier d412c57: cursor fractional accumulator + scroll honors scale;
-      # tap-then-hold window 200ms.
-      revision: 870a830aaac9f229c967f945f90fb00086b2d5d9
+      # 0abf239: mask the prior tap's click while tap-then-hold is pending --
+      # cancel the auto-release on touch-down inside the engage window so the
+      # host's LEFT stays held; if motion engages, the drag takes ownership
+      # without a visible click event (selections survive into the drag,
+      # matching the old immediate-engage feel). Earlier 870a830: deferred
+      # engage so double-tap isn't eaten; emit_click release-first; scroll
+      # slowdown halved.
+      revision: 0abf23905f3ae2f93ef015ca189ce902fbd41bc3
     - name: cirque-input-module
       remote: frosthaven
       # Pinned to our fork at an exact commit. Includes petejohanson's
