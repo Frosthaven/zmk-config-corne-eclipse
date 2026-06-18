@@ -30,14 +30,13 @@ manifest:
       # modules keyed on west.yml's hash and runs `west update --fetch smart`, so
       # pushing new branch commits without changing this file would silently
       # reuse a stale cached checkout. Bump this SHA on every driver change.
-      # 0abf239: mask the prior tap's click while tap-then-hold is pending --
-      # cancel the auto-release on touch-down inside the engage window so the
-      # host's LEFT stays held; if motion engages, the drag takes ownership
-      # without a visible click event (selections survive into the drag,
-      # matching the old immediate-engage feel). Earlier 870a830: deferred
-      # engage so double-tap isn't eaten; emit_click release-first; scroll
-      # slowdown halved.
-      revision: 0abf23905f3ae2f93ef015ca189ce902fbd41bc3
+      # a5f71c6: removed the unreliable two-finger zoom (pinch/expand). The
+      # 43mm pad couldn't detect a pinch consistently and at sensitive
+      # thresholds it stole two-finger scroll, so the feature is gone -- not
+      # just disabled by default. Earlier 0abf239: mask the prior tap's
+      # click while tap-then-hold is pending, so a drag absorbs the tap and
+      # selections survive into the drag.
+      revision: a5f71c67738b04950a7b177432986c739a0e3606
     - name: cirque-input-module
       remote: frosthaven
       # Pinned to our fork at an exact commit. Includes petejohanson's

@@ -6,44 +6,6 @@
 
 #include "corne_eclipse.dtsi"
 
-#if defined(TRACKPAD_PERIPHERAL) || defined(TRACKPAD_CENTRAL)
-#include <dt-bindings/zmk/keys.h>
-#include <dt-bindings/zmk/pointing.h>
-#include <zephyr/dt-bindings/input/input-event-codes.h>
-
-/* Map the trackpad's two-finger zoom to Ctrl+scroll (the de-facto zoom in
- * browsers/maps/image viewers). The forked Azoteq driver emits the zoom as KEY
- * clicks -- spread on INPUT_BTN_4, pinch on INPUT_BTN_5 -- because the behaviors
- * input processor is built for key events, not relative ones. Attached to
- * whichever listener consumes the trackpad on this (central) half below. */
-/ {
-    macros {
-        tp_zoom_in: tp_zoom_in {
-            compatible = "zmk,behavior-macro";
-            #binding-cells = <0>;
-            bindings = <&macro_press &kp LCTRL>
-                     , <&macro_tap &msc SCRL_UP>
-                     , <&macro_release &kp LCTRL>;
-        };
-        tp_zoom_out: tp_zoom_out {
-            compatible = "zmk,behavior-macro";
-            #binding-cells = <0>;
-            bindings = <&macro_press &kp LCTRL>
-                     , <&macro_tap &msc SCRL_DOWN>
-                     , <&macro_release &kp LCTRL>;
-        };
-    };
-
-    tp_zoom_proc: tp_zoom_proc {
-        compatible = "zmk,input-processor-behaviors";
-        #input-processor-cells = <0>;
-        type = <INPUT_EV_KEY>;
-        codes = <INPUT_BTN_4 INPUT_BTN_5>; /* zoom in (spread), zoom out (pinch) */
-        bindings = <&tp_zoom_in &tp_zoom_out>;
-    };
-};
-#endif
-
 &kscan0 {
     col-gpios
         = <&pro_micro 21 GPIO_ACTIVE_HIGH>
@@ -68,7 +30,6 @@
  * loses its display. */
 &azoteq_listener {
     status = "okay";
-    input-processors = <&tp_zoom_proc>;
 };
 
 &cirque_listener {
@@ -120,7 +81,6 @@
     azoteq_local_listener: azoteq_local_listener {
         compatible = "zmk,input-listener";
         device = <&azoteq_tp>;
-        input-processors = <&tp_zoom_proc>;
     };
 
     cirque_local_listener: cirque_local_listener {
