@@ -90,10 +90,12 @@ The **Azoteq TPS43** has a multi-touch gesture engine and additionally supports:
 
 - Two-finger tap for right click
 - Three-finger tap for middle click
-- **Press-and-hold drag-lock** (press and hold to grab, then drag; it holds
-  across finger lifts and is released by a tap). Starting the drag from a
-  press-and-hold rather than a tap means it can grab a multi-file selection
-  without the tap deselecting it.
+- **Tap-then-hold drag-lock** (tap, then touch again within 250 ms to grab,
+  then drag; the lock holds across finger lifts and is released by a tap, or
+  by a multi-finger tap as a guaranteed escape). The drag tracks the very
+  first move of the second touch — no hold-time wait. Note that the initial
+  tap fires a left click, so use Ctrl/Cmd-click for multi-select first if
+  you intend to drag a group selection.
 
 > **Pinch / expand zoom is not enabled.** It is implemented (the chip's zoom
 > gesture, mapped to Ctrl+scroll on the host), but the 43 mm pad is too small for
