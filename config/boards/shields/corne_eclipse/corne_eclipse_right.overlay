@@ -57,13 +57,13 @@
         one-finger-tap;
         two-finger-tap;
         three-finger-tap;
-        press-and-hold;
+        tap-then-hold;
         drag-lock;
         scroll;
         /* zoom; -- disabled: the 43mm pad is too small for the chip to detect a
          * pinch reliably, and at sensitive thresholds it steals scroll. */
         flip-x;
-        cursor-scale-percent = <65>;
+        cursor-scale-percent = <50>;
     };
 
     cirque_tp: cirque_pinnacle@2a {
