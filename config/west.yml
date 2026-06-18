@@ -30,12 +30,12 @@ manifest:
       # modules keyed on west.yml's hash and runs `west update --fetch smart`, so
       # pushing new branch commits without changing this file would silently
       # reuse a stale cached checkout. Bump this SHA on every driver change.
-      # 2663411: tap-then-hold drag-lock engagement -- a 1-finger tap arms the
+      # ddda9f8: tap-then-hold drag-lock engagement -- a 1-finger tap arms the
       # next single-finger touch-down (within 250ms) to latch the left button
       # instantly, no chip press-and-hold-time wait. Earlier fe0acfd: cursor-
       # scale-percent DT prop applied to REL_X/Y -- we set 50 in our DT to slow
       # the cursor 50%.
-      revision: 26634110575ed3903bea256cbd5681dbb2fed04d
+      revision: ddda9f82c27d2a662f41f9b895a537ec24c48a4f
     - name: cirque-input-module
       remote: frosthaven
       # Pinned to our fork at an exact commit. Includes petejohanson's
