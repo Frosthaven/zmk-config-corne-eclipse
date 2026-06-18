@@ -47,16 +47,11 @@
 #define NAVPAD 6
 #define SYSTEM 7
 
-/* Right-encoder action. On trackpad builds the right encoder zooms (Ctrl +
- * scroll); on the plain "no trackpads" builds it keeps ordinary mouse scroll.
- * The trackpad flags are set per build in build.yaml via DTS_EXTRA_CPPFLAGS. */
-#if defined(TRACKPAD_PERIPHERAL) || defined(TRACKPAD_CENTRAL)
-  #define RIGHT_ENC_V &zoom_encoder
-  #define RIGHT_ENC_H &zoom_encoder
-#else
-  #define RIGHT_ENC_V &scroll_vertical
-  #define RIGHT_ENC_H &scroll_horizontal
-#endif
+/* Right-encoder action: mouse scroll, all builds. (Two-finger scroll on the
+ * trackpad covers the same gesture, so the encoder doesn't need to double as
+ * a zoom wheel.) */
+#define RIGHT_ENC_V &scroll_vertical
+#define RIGHT_ENC_H &scroll_horizontal
 
 / {
 
@@ -71,18 +66,6 @@
       compatible = "zmk,behavior-sensor-rotate";
       #sensor-binding-cells = <0>;
       bindings = <&msc MOVE_X(-75)>, <&msc MOVE_X(75)>;
-      tap-ms = <100>;
-    };
-    // Right encoder zoom: each detent emits Ctrl + scroll, the de-facto
-    // desktop zoom (browsers, maps, image viewers) -- the same gesture the
-    // trackpad's two-finger zoom maps to. Drives the zoom_in/zoom_out macros
-    // which hold LCTRL across one &msc scroll tick. Used on trackpad builds
-    // only (see RIGHT_ENC_V/RIGHT_ENC_H gate above); non-trackpad builds keep
-    // scroll_vertical/scroll_horizontal.
-    zoom_encoder: zoom_encoder {
-      compatible = "zmk,behavior-sensor-rotate";
-      #sensor-binding-cells = <0>;
-      bindings = <&zoom_out>, <&zoom_in>;
       tap-ms = <100>;
     };
   };
@@ -108,25 +91,6 @@
           , <&macro_tap &kp SPACE>
           , <&macro_release &kp LCTRL>
           , <&macro_release &kp LGUI>
-          ;
-    )
-
-    // Zoom in / out: hold Ctrl across a single mouse-scroll tick. Bound by the
-    // zoom_encoder sensor-rotate behavior (right encoder, all layers).
-    ZMK_MACRO(zoom_in,
-      tap-ms = <100>;
-      bindings
-          = <&macro_press &kp LCTRL>
-          , <&macro_tap &msc SCRL_UP>
-          , <&macro_release &kp LCTRL>
-          ;
-    )
-    ZMK_MACRO(zoom_out,
-      tap-ms = <100>;
-      bindings
-          = <&macro_press &kp LCTRL>
-          , <&macro_tap &msc SCRL_DOWN>
-          , <&macro_release &kp LCTRL>
           ;
     )
 
